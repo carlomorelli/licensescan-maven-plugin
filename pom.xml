@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.csoft</groupId>
-  <artifactId>licenseanalysis-maven-plugin</artifactId>
+  <artifactId>licensescan-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <version>0.0.1-SNAPSHOT</version>
-  <name>maven-license-analysis-plugin Maven Mojo</name>
+  <name>licensescan-maven-plugin Maven Mojo</name>
   <url>http://maven.apache.org</url>
 
   <properties>
