@@ -11,8 +11,16 @@ public class MainMojo extends AbstractMojo {
     @Parameter(property = "person", defaultValue = "world")
     private String person;
 
-    public void execute() {
+    public String getPerson() {
+        return person;
+    }
 
+    public void setPerson(String person) {
+        this.person = person;
+    }
+
+    public void execute() {
         getLog().info("Hello " + person);
     }
+
 }
