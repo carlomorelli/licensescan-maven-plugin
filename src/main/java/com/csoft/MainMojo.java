@@ -1,13 +1,18 @@
 package com.csoft;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.*;
 
 import java.util.Set;
 
@@ -22,6 +27,12 @@ public class MainMojo extends AbstractMojo {
     @Parameter(defaultValue="${project}", readonly=true, required=true)
     private MavenProject project;
 
+    @Parameter(defaultValue="${session}", readonly=true, required=true)
+    private MavenSession session;
+
+    @Component
+    private ProjectBuilder projectBuilder;
+
     @Parameter(property = "person", defaultValue = "world")
     private String person;
 
@@ -31,7 +42,7 @@ public class MainMojo extends AbstractMojo {
         this.person = person;
     }
 
-    public void execute() {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         log.info("Hello " + person);
         log.info("Found project: " + project);
         log.info(" - artifactId          : " + project.getArtifactId());
@@ -54,8 +65,24 @@ public class MainMojo extends AbstractMojo {
         log.info("-----------------------");
         Set<Artifact> transitiveDependencies = project.getArtifacts();
         transitiveDependencies.removeAll(project.getDependencyArtifacts());
-        for (Artifact artifact : transitiveDependencies) {
-            log.info(" - " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ":" + artifact.getScope());
+        ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+
+        try {
+            for (Artifact artifact : transitiveDependencies) {
+                buildingRequest.setProject(null);
+                MavenProject mavenProject = projectBuilder.build(artifact, buildingRequest).getProject();
+
+                log.info(" - artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ":" + artifact.getScope());
+                if (mavenProject.getLicenses().isEmpty()) {
+                    log.info("   with license: n/a");
+                } else {
+                    for (License license : mavenProject.getLicenses()) {
+                        log.info("   with license: " + license.getName());
+                    }
+                }
+            }
+        } catch (ProjectBuildingException e) {
+            throw new MojoExecutionException("Error while building project", e);
         }
 
     }
