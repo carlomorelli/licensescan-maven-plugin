@@ -20,7 +20,7 @@ Plugin configuration example in a project:
  <plugin>
     <groupId>com.github.carlomorelli</groupId>
     <artifactId>licensescan-maven-plugin</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <configuration>
       <printLicenses>true</printLicenses>
       <blacklistedLicenses>
