@@ -37,4 +37,9 @@
     </dependency>
   </dependencies>
 
+  <scm>
+    <developerConnection>scm:git:https://github.com/carlomorelli/licensescan-maven-plugin.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
 </project>
