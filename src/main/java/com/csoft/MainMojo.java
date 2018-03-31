@@ -33,17 +33,16 @@ public class MainMojo extends AbstractMojo {
     @Component
     private ProjectBuilder projectBuilder;
 
-    @Parameter(property = "person", defaultValue = "world")
-    private String person;
+    @Parameter(property = "printLicenses", defaultValue = "false")
+    private boolean printLicenses;
 
     private Log log = getLog();
 
-    public void setPerson(String person) {
-        this.person = person;
+    public void setPrintLicenses(boolean printLicenses) {
+        this.printLicenses = printLicenses;
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        log.info("Hello " + person);
         log.info("Found project: " + project);
         log.info(" - artifactId          : " + project.getArtifactId());
         log.info(" - groupId             : " + project.getGroupId());
@@ -69,15 +68,16 @@ public class MainMojo extends AbstractMojo {
 
         try {
             for (Artifact artifact : transitiveDependencies) {
-                buildingRequest.setProject(null);
-                MavenProject mavenProject = projectBuilder.build(artifact, buildingRequest).getProject();
-
                 log.info(" - artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ":" + artifact.getScope());
-                if (mavenProject.getLicenses().isEmpty()) {
-                    log.info("   with license: n/a");
-                } else {
-                    for (License license : mavenProject.getLicenses()) {
-                        log.info("   with license: " + license.getName());
+                if (printLicenses) {
+                    buildingRequest.setProject(null);
+                    MavenProject mavenProject = projectBuilder.build(artifact, buildingRequest).getProject();
+                    if (mavenProject.getLicenses().isEmpty()) {
+                        log.info("   with license: n/a");
+                    } else {
+                        for (License license : mavenProject.getLicenses()) {
+                            log.info("   with license: " + license.getName());
+                        }
                     }
                 }
             }
