@@ -115,6 +115,7 @@ public class MainMojo extends AbstractMojo {
             throw new MojoExecutionException("Error while building project", e);
         }
 
+        boolean potentiallyFailBuild = false;
         if (blacklistedLicenses != null && !blacklistedLicenses.isEmpty()) {
             log.warn("BLACKLIST");
             log.warn("-----------------------");
@@ -125,10 +126,11 @@ public class MainMojo extends AbstractMojo {
                     for (String artifact : array) {
                         log.warn(" - " + artifact);
                     }
+                    potentiallyFailBuild = true;
                 }
             }
 
-            if (failBuildOnBlacklisted) {
+            if (failBuildOnBlacklisted && potentiallyFailBuild) {
                 throw new MojoFailureException("Failing build");
             }
         }
