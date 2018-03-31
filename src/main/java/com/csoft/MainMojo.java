@@ -18,7 +18,7 @@ import java.util.*;
 
 
 @Mojo(
-        name = "sayshi",
+        name = "audit",
         requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME
 )
