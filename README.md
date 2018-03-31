@@ -20,7 +20,7 @@ Plugin configuration example in a project:
  <plugin>
     <groupId>com.github.carlomorelli</groupId>
     <artifactId>licensescan-maven-plugin</artifactId>
-    <version>master-SNAPSHOT</version>
+    <version>1.0</version>
     <configuration>
       <printLicenses>true</printLicenses>
       <blacklistedLicenses>
@@ -55,4 +55,5 @@ If the `<executions/>` block is configured, the plugin will run during your sele
 mvn licensescan:audit
 ```
 Let me know if you find this plugin useful!
+
 --Carlo
