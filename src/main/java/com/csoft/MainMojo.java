@@ -14,7 +14,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.*;
 
-import java.util.Set;
+import java.util.*;
 
 
 @Mojo(
@@ -36,13 +36,36 @@ public class MainMojo extends AbstractMojo {
     @Parameter(property = "printLicenses", defaultValue = "false")
     private boolean printLicenses;
 
+    @Parameter(property = "blacklistedLicenses")
+    private List<String> blacklistedLicenses;
+
+    @Parameter(property = "failBuildOnBlacklisted", defaultValue = "false")
+    private boolean failBuildOnBlacklisted;
+
     private Log log = getLog();
 
     public void setPrintLicenses(boolean printLicenses) {
         this.printLicenses = printLicenses;
     }
 
+    public void setBlacklistedLicenses(List<String> blacklistedLicenses) {
+        this.blacklistedLicenses = blacklistedLicenses;
+    }
+
+    public void setFailBuildOnBlacklisted(boolean failBuildOnBlacklisted) {
+        this.failBuildOnBlacklisted = failBuildOnBlacklisted;
+    }
+
     public void execute() throws MojoExecutionException, MojoFailureException {
+
+        Map<String, List<String>> blacklistedMap = new HashMap<String, List<String>>();
+        if (!blacklistedLicenses.isEmpty()) {
+            for (String blacklistedLicense : blacklistedLicenses) {
+                blacklistedMap.put(blacklistedLicense, new ArrayList<String>());
+            }
+        }
+
+
         log.info("Found project: " + project);
         log.info(" - artifactId          : " + project.getArtifactId());
         log.info(" - groupId             : " + project.getGroupId());
@@ -68,7 +91,8 @@ public class MainMojo extends AbstractMojo {
 
         try {
             for (Artifact artifact : transitiveDependencies) {
-                log.info(" - artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ":" + artifact.getScope());
+                String artifactLabel = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ":" + artifact.getScope();
+                log.info(" - artifact " + artifactLabel);
                 if (printLicenses) {
                     buildingRequest.setProject(null);
                     MavenProject mavenProject = projectBuilder.build(artifact, buildingRequest).getProject();
@@ -77,6 +101,12 @@ public class MainMojo extends AbstractMojo {
                     } else {
                         for (License license : mavenProject.getLicenses()) {
                             log.info("   with license: " + license.getName());
+                            if (blacklistedMap.keySet().contains(license.getName())) {
+                                List<String> array = blacklistedMap.get(license.getName());
+                                array.add(artifactLabel);
+                                blacklistedMap.put(license.getName(), array);
+                                log.warn("WARNING: found blacklisted license");
+                            }
                         }
                     }
                 }
@@ -85,6 +115,23 @@ public class MainMojo extends AbstractMojo {
             throw new MojoExecutionException("Error while building project", e);
         }
 
+        if (blacklistedLicenses != null && !blacklistedLicenses.isEmpty()) {
+            log.warn("BLACKLIST");
+            log.warn("-----------------------");
+            for (String blacklistedLicense : blacklistedLicenses) {
+                List<String> array = blacklistedMap.get(blacklistedLicense);
+                if (!array.isEmpty()) {
+                    log.warn("Found " + array.size() + " violations for license '" + blacklistedLicense +"':");
+                    for (String artifact : array) {
+                        log.warn(" - " + artifact);
+                    }
+                }
+            }
+
+            if (failBuildOnBlacklisted) {
+                throw new MojoFailureException("Failing build");
+            }
+        }
     }
 
 }
