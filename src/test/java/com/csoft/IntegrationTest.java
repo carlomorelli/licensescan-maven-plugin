@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import java.io.File;
 
 @RunWith(MavenJUnitTestRunner.class)
-@MavenVersions({"3.2.3", "3.2.5"})
+@MavenVersions({"3.2.3", "3.2.5", "3.6.0"})
 public class IntegrationTest {
     @Rule
     public final TestResources resources = new TestResources();
