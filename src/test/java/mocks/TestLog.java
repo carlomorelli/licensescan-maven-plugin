@@ -44,7 +44,7 @@ public class TestLog extends SystemStreamLog {
 
     private void assertMessage(String level, String mssg) {
         for(LogRow l : logs){
-            if(l.level.equals(level) && l.mssg.equals(mssg)){
+            if(l.level.equals(level) && l.mssg.contains(mssg)){
                 return;
             }
         }

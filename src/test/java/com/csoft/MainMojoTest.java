@@ -1,7 +1,5 @@
 package com.csoft;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import io.takari.maven.testing.TestMavenRuntime;
 import io.takari.maven.testing.TestResources;
 import mocks.TestLog;
@@ -9,7 +7,6 @@ import mocks.TestProjectBuilder;
 import mocks.TestUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.junit.Before;
@@ -18,10 +15,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
-import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -52,7 +47,7 @@ public class MainMojoTest {
         log.assertInfo(" - groupId             : com.acme.test.co");
         log.assertInfo(" - description         : A nice test pom");
         log.assertInfo(" - version             : 1");
-        log.assertInfo(" - getArtifact.activeP : []");
+        log.assertInfo(" - getArtifact.activeP : ");
         log.assertInfo(" - getArtifact.artId   : test-project");
         log.assertInfo(" - getArtifact.groupId : com.acme.test.co");
         log.assertInfo(" - getArtifact.version : 1");
@@ -62,14 +57,9 @@ public class MainMojoTest {
     @Test
     public void passesWithAllGoodLicenses() throws Exception {
         MainMojo mojo = configure(
-                builder.createArtifact("acme",
-                    "main",
-                    "2",
-                    goodLicense),
-                builder.createArtifact("acme",
-                        "artifact",
-                        "1",
-                        goodLicense));
+                builder.createArtifact("acme", "main", "2", goodLicense),
+                builder.createArtifact("acme", "artifact", "1", goodLicense)
+        );
 
         mojo.execute();
 
@@ -78,11 +68,10 @@ public class MainMojoTest {
 
     @Test
     public void willFailWhenBannedLicenseShowsUpInTransient() throws Exception {
-        MainMojo mojo = configure(empty,
-                builder.createArtifact("acme",
-                        "artifact",
-                        "1",
-                        badLicense));
+        MainMojo mojo = configure(
+                empty,
+                builder.createArtifact("acme", "artifact", "1", badLicense)
+        );
 
         try {
             mojo.execute();
@@ -101,11 +90,11 @@ public class MainMojoTest {
      * */
     @Test
     public void doesNotFailUnlessPrintLicensesIsOn() throws Exception {
-        MainMojo mojo = configure(empty,
-                builder.createArtifact("acme",
-                        "artifact",
-                        "1",
-                        badLicense));
+        MainMojo mojo = configure(
+                empty,
+                builder.createArtifact("acme", "artifact", "1", badLicense)
+        );
+
         mojo.setPrintLicenses(false);
 
         mojo.execute();
@@ -115,11 +104,10 @@ public class MainMojoTest {
 
     @Test
     public void doeNotFailOnDirectDependencies() throws Exception {
-        MainMojo mojo = configure(builder.createArtifact("acme",
-                "artifact",
-                "1",
-                badLicense),
-                empty);
+        MainMojo mojo = configure(
+                builder.createArtifact("acme", "artifact", "1", badLicense),
+                empty
+        );
 
         mojo.execute();
 
