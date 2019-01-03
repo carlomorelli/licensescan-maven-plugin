@@ -1,5 +1,6 @@
 package mocks;
 
+import com.google.common.collect.ComparisonChain;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.License;
 import org.apache.maven.model.building.ModelProblem;
@@ -11,12 +12,18 @@ import java.util.*;
 
 public class TestProjectBuilder implements ProjectBuilder
 {
-    private Map<Artifact, Set<License>> licenses = new HashMap<Artifact, Set<License>>();
+    private Map<Artifact, TreeSet<License>> licenses = new HashMap<Artifact, TreeSet<License>>();
 
     public Set<Artifact> createArtifact(String group, String artifact, String version, String... licenseStrings) {
         Artifact a = new TestArtifact(group, artifact, version);
         if(!licenses.containsKey(a)){
-            licenses.put(a, new HashSet<License>());
+            licenses.put(a, new TreeSet<License>(new Comparator<License>() {
+                public int compare(License o1, License o2) {
+                    return ComparisonChain.start()
+                            .compare(o1.getName(), o2.getName())
+                            .result();
+                }
+            }));
         }
         licenses.get(a).addAll(toLicenses(licenseStrings));
         return Collections.singleton(a);
@@ -84,4 +91,6 @@ public class TestProjectBuilder implements ProjectBuilder
             return null;
         }
     }
+
+
 }

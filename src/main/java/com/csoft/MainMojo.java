@@ -2,7 +2,6 @@ package com.csoft;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.License;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
@@ -43,6 +42,8 @@ public class MainMojo extends AbstractMojo {
     @Parameter(property = "failBuildOnBlacklisted", defaultValue = "false")
     private boolean failBuildOnBlacklisted;
 
+    private final Map<String, List<String>> blacklistedMap = new HashMap<String, List<String>>();
+
     public MainMojo(){
 
     }
@@ -69,7 +70,6 @@ public class MainMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        Map<String, List<String>> blacklistedMap = new HashMap<String, List<String>>();
         if (!blacklistedLicenses.isEmpty()) {
             for (String blacklistedLicense : blacklistedLicenses) {
                 blacklistedMap.put(blacklistedLicense, new ArrayList<String>());
@@ -90,14 +90,38 @@ public class MainMojo extends AbstractMojo {
 
         getLog().info("BASE DEPENDENCIES");
         getLog().info("-----------------------");
-        for (Dependency dependency : project.getDependencies()) {
-            getLog().info(" - " + dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion() + ":" + dependency.getScope());
-        }
+        analyze(project.getDependencyArtifacts());
 
+        getLog().info("");
         getLog().info("TRANSITIVE DEPENDENCIES");
         getLog().info("-----------------------");
         Set<Artifact> transitiveDependencies = project.getArtifacts();
         transitiveDependencies.removeAll(project.getDependencyArtifacts());
+
+        analyze(transitiveDependencies);
+
+        boolean potentiallyFailBuild = false;
+        if (blacklistedLicenses != null && !blacklistedLicenses.isEmpty()) {
+            getLog().warn("BLACKLIST");
+            getLog().warn("-----------------------");
+            for (String blacklistedLicense : blacklistedLicenses) {
+                List<String> array = blacklistedMap.get(blacklistedLicense);
+                if (!array.isEmpty()) {
+                    getLog().warn("Found " + array.size() + " violations for license '" + blacklistedLicense +"':");
+                    for (String artifact : array) {
+                        getLog().warn(" - " + artifact);
+                    }
+                    potentiallyFailBuild = true;
+                }
+            }
+
+            if (failBuildOnBlacklisted && potentiallyFailBuild) {
+                throw new MojoFailureException("Failing build");
+            }
+        }
+    }
+
+    private void analyze(Set<Artifact> transitiveDependencies) throws MojoExecutionException {
         ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
         buildingRequest.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
 
@@ -125,26 +149,6 @@ public class MainMojo extends AbstractMojo {
             }
         } catch (ProjectBuildingException e) {
             throw new MojoExecutionException("Error while building project", e);
-        }
-
-        boolean potentiallyFailBuild = false;
-        if (blacklistedLicenses != null && !blacklistedLicenses.isEmpty()) {
-            getLog().warn("BLACKLIST");
-            getLog().warn("-----------------------");
-            for (String blacklistedLicense : blacklistedLicenses) {
-                List<String> array = blacklistedMap.get(blacklistedLicense);
-                if (!array.isEmpty()) {
-                    getLog().warn("Found " + array.size() + " violations for license '" + blacklistedLicense +"':");
-                    for (String artifact : array) {
-                        getLog().warn(" - " + artifact);
-                    }
-                    potentiallyFailBuild = true;
-                }
-            }
-
-            if (failBuildOnBlacklisted && potentiallyFailBuild) {
-                throw new MojoFailureException("Failing build");
-            }
         }
     }
 
