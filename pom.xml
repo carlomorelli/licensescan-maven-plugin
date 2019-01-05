@@ -4,7 +4,7 @@
   <groupId>com.github.carlomorelli</groupId>
   <artifactId>licensescan-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.1</version>
+  <version>2.0</version>
   <name>licensescan-maven-plugin</name>
   <url>http://maven.apache.org</url>
 
