@@ -83,6 +83,40 @@ public class MainMojoTest {
         }
     }
 
+    @Test
+    public void doesFailOnDirectDependencies() throws Exception {
+        MainMojo mojo = configure(
+                builder.createArtifact("acme", "artifact", "1", badLicense),
+                empty
+        );
+
+        try {
+            mojo.execute();
+            fail("should have thrown error");
+        } catch (MojoFailureException e) {
+            assertEquals("Failing build", e.getMessage());
+            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
+            log.assertWarning(" - acme:artifact:1:null");
+        }
+    }
+
+    @Test
+    public void doesNotAnalyzePrimaryDependenciesAsTransient() throws Exception {
+        MainMojo mojo = configure(
+                builder.createArtifact("acme", "artifact", "1", badLicense),
+                builder.createArtifact("acme", "artifact", "1", badLicense)
+        );
+
+        try {
+            mojo.execute();
+            fail("should have thrown error");
+        } catch (MojoFailureException e) {
+            assertEquals("Failing build", e.getMessage());
+            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
+            log.assertWarning(" - acme:artifact:1:null");
+        }
+    }
+
     /*
      * The following are a set of characterization tests that I think are probably bugs
      * These tests clarify current behavior for discussion
@@ -96,18 +130,6 @@ public class MainMojoTest {
         );
 
         mojo.setPrintLicenses(false);
-
-        mojo.execute();
-
-        log.assertNoWarning("Found 1 violations for license 'Bad Banned License v2':");
-    }
-
-    @Test
-    public void doeNotFailOnDirectDependencies() throws Exception {
-        MainMojo mojo = configure(
-                builder.createArtifact("acme", "artifact", "1", badLicense),
-                empty
-        );
 
         mojo.execute();
 

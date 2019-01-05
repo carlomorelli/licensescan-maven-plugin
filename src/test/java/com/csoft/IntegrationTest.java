@@ -39,13 +39,4 @@ public class IntegrationTest {
                 .execute("licensescan:audit")
                 .assertLogText("[ERROR]");
     }
-
-    @Test
-    public void test_isThisABug() throws Exception {
-        File basedir = resources.getBasedir("integration_probably_bug");
-        System.out.println(basedir.getAbsolutePath());
-        maven.forProject(basedir)
-                .execute("licensescan:audit")
-                .assertErrorFreeLog();
-    }
 }
