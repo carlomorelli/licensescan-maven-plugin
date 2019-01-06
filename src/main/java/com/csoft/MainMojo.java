@@ -129,20 +129,20 @@ public class MainMojo extends AbstractMojo {
             for (Artifact artifact : transitiveDependencies) {
                 String artifactLabel = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ":" + artifact.getScope();
                 getLog().info(" - artifact " + artifactLabel);
-                if (printLicenses) {
-                    buildingRequest.setProject(null);
-                    MavenProject mavenProject = projectBuilder.build(artifact, buildingRequest).getProject();
-                    if (mavenProject.getLicenses().isEmpty()) {
-                        getLog().info("   with license: n/a");
-                    } else {
-                        for (License license : mavenProject.getLicenses()) {
+                buildingRequest.setProject(null);
+                MavenProject mavenProject = projectBuilder.build(artifact, buildingRequest).getProject();
+                if (printLicenses && mavenProject.getLicenses().isEmpty()) {
+                    getLog().info("   with license: n/a");
+                } else {
+                    for (License license : mavenProject.getLicenses()) {
+                        if (printLicenses) {
                             getLog().info("   with license: " + license.getName());
-                            if (blacklistedMap.keySet().contains(license.getName())) {
-                                List<String> array = blacklistedMap.get(license.getName());
-                                array.add(artifactLabel);
-                                blacklistedMap.put(license.getName(), array);
-                                getLog().warn("WARNING: found blacklisted license");
-                            }
+                        }
+                        if (blacklistedMap.keySet().contains(license.getName())) {
+                            List<String> array = blacklistedMap.get(license.getName());
+                            array.add(artifactLabel);
+                            blacklistedMap.put(license.getName(), array);
+                            getLog().warn("WARNING: found blacklisted license");
                         }
                     }
                 }

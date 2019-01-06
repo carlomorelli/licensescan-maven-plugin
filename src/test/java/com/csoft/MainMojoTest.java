@@ -117,11 +117,6 @@ public class MainMojoTest {
         }
     }
 
-    /*
-     * The following are a set of characterization tests that I think are probably bugs
-     * These tests clarify current behavior for discussion
-     * If these are desired, simply remove this comment.
-     * */
     @Test
     public void doesNotFailUnlessPrintLicensesIsOn() throws Exception {
         MainMojo mojo = configure(
@@ -131,9 +126,14 @@ public class MainMojoTest {
 
         mojo.setPrintLicenses(false);
 
-        mojo.execute();
-
-        log.assertNoWarning("Found 1 violations for license 'Bad Banned License v2':");
+        try {
+            mojo.execute();
+            fail("should have thrown error");
+        } catch (MojoFailureException e) {
+            assertEquals("Failing build", e.getMessage());
+            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
+            log.assertWarning(" - acme:artifact:1:null");
+        }
     }
 
     private MainMojo configure(Set<Artifact> primaryArtifacts,
