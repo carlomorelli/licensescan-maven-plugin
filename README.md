@@ -2,6 +2,12 @@
 
 [![](https://jitpack.io/v/carlomorelli/licensescan-maven-plugin.svg)](https://jitpack.io/#carlomorelli/licensescan-maven-plugin)
 
+[![Build Status](https://travis-ci.org/carlomorelli/licensescan-maven-plugin.svg?branch=master)](https://travis-ci.org/carlomorelli/licensescan-maven-plugin)
+
+[![Coverage Status](https://coveralls.io/repos/github/carlomorelli/licensescan-maven-plugin/badge.svg?branch=master)](https://coveralls.io/github/carlomorelli/licensescan-maven-plugin?branch=master)
+
+
+
 LicenseScan Maven plugin audits the dependencies and the transitive dependencies for the Runtime and Compile scopes,
 and allow to fail the build if a license is detected belonging to the configured blacklist.
 
