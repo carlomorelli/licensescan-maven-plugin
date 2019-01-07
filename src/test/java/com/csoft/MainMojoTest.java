@@ -23,6 +23,7 @@ import static org.junit.Assert.fail;
 public class MainMojoTest {
     private final String goodLicense = "Happy Freedom License v1";
     private final String badLicense = "Bad Banned License v2";
+    private final String regex = "regex:Apache.*Version 1.*";
 
     private final Set<Artifact> empty = Collections.emptySet();
     @Rule
@@ -101,6 +102,23 @@ public class MainMojoTest {
     }
 
     @Test
+    public void canUseRegex() throws Exception {
+        MainMojo mojo = configure(
+                builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0"),
+                builder.createArtifact("acme", "else", "1", "Apache License, Version 2.0")
+        );
+
+        try {
+            mojo.execute();
+            fail("should have thrown error");
+        } catch (MojoFailureException e) {
+            assertEquals("Failing build", e.getMessage());
+            log.assertWarning("Found 1 violations for license 'regex:Apache.*Version 1.*':");
+            log.assertWarning(" - acme:artifact:1:null");
+        }
+    }
+
+    @Test
     public void doesNotAnalyzePrimaryDependenciesAsTransient() throws Exception {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", badLicense),
@@ -147,7 +165,7 @@ public class MainMojoTest {
             MainMojo mainMojo = new MainMojo(proj, session, builder, log);
             mainMojo.setPrintLicenses(true);
             mainMojo.setFailBuildOnBlacklisted(true);
-            mainMojo.setBlacklistedLicenses(Arrays.asList(badLicense));
+            mainMojo.setBlacklistedLicenses(Arrays.asList(badLicense, regex));
             return mainMojo;
         } catch (Exception e) {
             throw new RuntimeException(e);

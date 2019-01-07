@@ -48,7 +48,17 @@ public class TestLog extends SystemStreamLog {
                 return;
             }
         }
-        fail("No log line level: " + level + " message: " + mssg);
+        fail("No log line level: " + level + " message: " + mssg + "\n but found:" + getLevelMessages(level));
+    }
+
+    private String getLevelMessages(String level) {
+        StringBuffer buffer = new StringBuffer();
+        for(LogRow l : logs){
+            if(l.level.equals(level)){
+                buffer.append("\n").append("[").append(level).append("] ").append(l.mssg);
+            }
+        }
+        return buffer.toString();
     }
 
     private class LogRow {
