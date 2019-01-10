@@ -19,7 +19,8 @@ The following configuration parameters are offered:
 * `failBuildOnBlacklisted`: if `blacklistedLicenses` are configured and at least a violation is found, makes the build fail (default `false`)
 
 Parameter list `blacklistedLicenses` is tricky to configure as some Maven artifacts use different names (e.g. Apache 2.0, Apache Apache License, Version 2.0, Apache Version 2.0, etc...) for the same license.
-My personal suggestion before compiling this list is to run the plugin with `printLicenses` set to `true`, note down all the license naming variation found, and then compile the blacklist from that.
+For this reason the plugin supports Regex expressions. You can define a regex for a license by prefixing the string with "regex:" like this:
+```<license>regex:Apache.*</license>```. Literal string names are also case insensitive to make them a little easier.
 
 Plugin configuration example in a project:
 ```xml
