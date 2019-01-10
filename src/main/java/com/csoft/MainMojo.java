@@ -15,6 +15,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.*;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 @Mojo(
@@ -138,10 +139,11 @@ public class MainMojo extends AbstractMojo {
                         if (printLicenses) {
                             getLog().info("   with license: " + license.getName());
                         }
-                        if (blacklistedMap.keySet().contains(license.getName())) {
-                            List<String> array = blacklistedMap.get(license.getName());
+                        Match forbiddenMatch = isForbiddenLicense(license);
+                        if (forbiddenMatch.isMatch) {
+                            List<String> array = blacklistedMap.get(forbiddenMatch.licenseEntry);
                             array.add(artifactLabel);
-                            blacklistedMap.put(license.getName(), array);
+                            blacklistedMap.put(forbiddenMatch.licenseEntry, array);
                             getLog().warn("WARNING: found blacklisted license");
                         }
                     }
@@ -149,6 +151,35 @@ public class MainMojo extends AbstractMojo {
             }
         } catch (ProjectBuildingException e) {
             throw new MojoExecutionException("Error while building project", e);
+        }
+    }
+
+    private Match isForbiddenLicense(License license) {
+        for(String entry : blacklistedMap.keySet()){
+            if(entry.startsWith("regex:")){
+                Pattern p = Pattern.compile(entry.replace("regex:",""), Pattern.CASE_INSENSITIVE);
+                if(p.matcher(license.getName()).find()){
+                    return new Match(entry);
+                }
+            } else if (entry.equalsIgnoreCase(license.getName())) {
+                return new Match(entry);
+            }
+        }
+        return new Match();
+    }
+
+    private class Match {
+        final boolean isMatch;
+        final String licenseEntry;
+
+        Match(){
+            this.isMatch = false;
+            this.licenseEntry = null;
+        }
+
+        Match(String licenseEntry){
+            this.isMatch = true;
+            this.licenseEntry = licenseEntry;
         }
     }
 
