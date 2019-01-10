@@ -157,7 +157,7 @@ public class MainMojo extends AbstractMojo {
     private Match isForbiddenLicense(License license) {
         for(String entry : blacklistedMap.keySet()){
             if(entry.startsWith("regex:")){
-                Pattern p = Pattern.compile(entry.replace("regex:",""));
+                Pattern p = Pattern.compile(entry.replace("regex:",""), Pattern.CASE_INSENSITIVE);
                 if(p.matcher(license.getName()).find()){
                     return new Match(entry);
                 }

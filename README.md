@@ -20,7 +20,7 @@ The following configuration parameters are offered:
 
 Parameter list `blacklistedLicenses` is tricky to configure as some Maven artifacts use different names (e.g. Apache 2.0, Apache Apache License, Version 2.0, Apache Version 2.0, etc...) for the same license.
 For this reason the plugin supports Regex expressions. You can define a regex for a license by prefixing the string with "regex:" like this:
-```<license>regex:Apache.*</license>```. Literal string names are also case insensitive to make them a little easier.
+```<license>regex:Apache.*</license>```. Literal string names and regex strings are also case insensitive to make them a little easier.
 
 Plugin configuration example in a project:
 ```xml
@@ -33,7 +33,7 @@ Plugin configuration example in a project:
       <blacklistedLicenses>
         <license>GNU General Public License, v2.0</license>
         <license>GNU General Public License, v3.0</license>
-        <license>GNU Affero General Public License</license>
+        <license>.*Affero.*</license>
       </blacklistedLicenses>
       <failBuildOnBlacklisted>true</failBuildOnBlacklisted>
     </configuration>

@@ -101,11 +101,30 @@ public class MainMojoTest {
         }
     }
 
+
+
     @Test
     public void canUseRegex() throws Exception {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0"),
                 builder.createArtifact("acme", "else", "1", "Apache License, Version 2.0")
+        );
+
+        try {
+            mojo.execute();
+            fail("should have thrown error");
+        } catch (MojoFailureException e) {
+            assertEquals("Failing build", e.getMessage());
+            log.assertWarning("Found 1 violations for license 'regex:Apache.*Version 1.*':");
+            log.assertWarning(" - acme:artifact:1:null");
+        }
+    }
+
+    @Test
+    public void regexisNotCaseSensitive() throws Exception {
+        MainMojo mojo = configure(
+                builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0".toUpperCase()),
+                empty
         );
 
         try {
