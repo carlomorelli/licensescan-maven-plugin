@@ -1,10 +1,12 @@
 package com.csoft;
 
-import io.takari.maven.testing.TestMavenRuntime;
-import io.takari.maven.testing.TestResources;
-import mocks.TestLog;
-import mocks.TestProjectBuilder;
-import mocks.TestUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoFailureException;
@@ -13,12 +15,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import io.takari.maven.testing.TestMavenRuntime;
+import io.takari.maven.testing.TestResources;
+import mocks.TestLog;
+import mocks.TestProjectBuilder;
+import mocks.TestUtils;
 
 public class MainMojoTest {
     private final String goodLicense = "Happy Freedom License v1";
@@ -57,10 +58,8 @@ public class MainMojoTest {
 
     @Test
     public void passesWithAllGoodLicenses() throws Exception {
-        MainMojo mojo = configure(
-                builder.createArtifact("acme", "main", "2", goodLicense),
-                builder.createArtifact("acme", "artifact", "1", goodLicense)
-        );
+        MainMojo mojo = configure(builder.createArtifact("acme", "main", "2", goodLicense),
+                builder.createArtifact("acme", "artifact", "1", goodLicense));
 
         mojo.execute();
 
@@ -69,10 +68,7 @@ public class MainMojoTest {
 
     @Test
     public void willFailWhenBannedLicenseShowsUpInTransient() throws Exception {
-        MainMojo mojo = configure(
-                empty,
-                builder.createArtifact("acme", "artifact", "1", badLicense)
-        );
+        MainMojo mojo = configure(empty, builder.createArtifact("acme", "artifact", "1", badLicense));
 
         try {
             mojo.execute();
@@ -86,10 +82,7 @@ public class MainMojoTest {
 
     @Test
     public void doesFailOnDirectDependencies() throws Exception {
-        MainMojo mojo = configure(
-                builder.createArtifact("acme", "artifact", "1", badLicense),
-                empty
-        );
+        MainMojo mojo = configure(builder.createArtifact("acme", "artifact", "1", badLicense), empty);
 
         try {
             mojo.execute();
@@ -101,14 +94,10 @@ public class MainMojoTest {
         }
     }
 
-
-
     @Test
     public void canUseRegex() throws Exception {
-        MainMojo mojo = configure(
-                builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0"),
-                builder.createArtifact("acme", "else", "1", "Apache License, Version 2.0")
-        );
+        MainMojo mojo = configure(builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0"),
+                builder.createArtifact("acme", "else", "1", "Apache License, Version 2.0"));
 
         try {
             mojo.execute();
@@ -123,9 +112,7 @@ public class MainMojoTest {
     @Test
     public void regexisNotCaseSensitive() throws Exception {
         MainMojo mojo = configure(
-                builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0".toUpperCase()),
-                empty
-        );
+                builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0".toUpperCase()), empty);
 
         try {
             mojo.execute();
@@ -139,10 +126,8 @@ public class MainMojoTest {
 
     @Test
     public void doesNotAnalyzePrimaryDependenciesAsTransient() throws Exception {
-        MainMojo mojo = configure(
-                builder.createArtifact("acme", "artifact", "1", badLicense),
-                builder.createArtifact("acme", "artifact", "1", badLicense)
-        );
+        MainMojo mojo = configure(builder.createArtifact("acme", "artifact", "1", badLicense),
+                builder.createArtifact("acme", "artifact", "1", badLicense));
 
         try {
             mojo.execute();
@@ -156,10 +141,7 @@ public class MainMojoTest {
 
     @Test
     public void doesNotFailUnlessPrintLicensesIsOn() throws Exception {
-        MainMojo mojo = configure(
-                empty,
-                builder.createArtifact("acme", "artifact", "1", badLicense)
-        );
+        MainMojo mojo = configure(empty, builder.createArtifact("acme", "artifact", "1", badLicense));
 
         mojo.setPrintLicenses(false);
 
@@ -173,8 +155,33 @@ public class MainMojoTest {
         }
     }
 
-    private MainMojo configure(Set<Artifact> primaryArtifacts,
-                               Set<Artifact> transientArtifacts) {
+    @Test
+    public void doesFailWithoutOverride() throws Exception {
+        MainMojo mojo = configure(builder.createArtifact("acme", "artifact", "1", goodLicense, badLicense), empty);
+
+        mojo.setOverruleOnNotBlacklisted(false);
+
+        try {
+            mojo.execute();
+            fail("should have thrown error");
+        } catch (MojoFailureException e) {
+            assertEquals("Failing build", e.getMessage());
+            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
+            log.assertWarning(" - acme:artifact:1:null");
+        }
+    }
+
+    @Test
+    public void doesNotFailWithOverride() throws Exception {
+        MainMojo mojo = configure(builder.createArtifact("acme", "artifact", "1", goodLicense, badLicense), empty);
+
+        mojo.setOverruleOnNotBlacklisted(true);
+
+        mojo.execute();
+        log.assertNoWarning("Found 1 violations for license 'Bad Banned License v2':");
+    }
+
+    private MainMojo configure(Set<Artifact> primaryArtifacts, Set<Artifact> transientArtifacts) {
         try {
             MavenProject proj = maven.readMavenProject(testResources.getBasedir("basic"));
             proj.setArtifacts(TestUtils.union(primaryArtifacts, transientArtifacts));
