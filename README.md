@@ -40,8 +40,8 @@ Plugin configuration example in a project:
       </blacklistedLicenses>
       <failBuildOnBlacklisted>true</failBuildOnBlacklisted>
       <processPlugins>false</processPlugins>
-			<resolveDependencies>false</resolveDependencies>
-			<overruleOnNotBlacklisted>true</overruleOnNotBlacklisted>
+      <resolveDependencies>false</resolveDependencies>
+      <overruleOnNotBlacklisted>true</overruleOnNotBlacklisted>
     </configuration>
     <executions>
       <execution>
