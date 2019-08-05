@@ -17,6 +17,9 @@ The following configuration parameters are offered:
 * `printLicenses`: prints the scanned licenses during the build (default `false`)
 * `blacklistedLicenses`: list of licenses that will make the build fail if detected
 * `failBuildOnBlacklisted`: if `blacklistedLicenses` are configured and at least a violation is found, makes the build fail (default `false`)
+* `processPlugins`: forces full lifecycle binding injection during the build: N.B. ensure this is set to `false` for `bundle` packages (default `false`)
+* `resolveDependencies`: resolves artefact dependencies during the build (default `false`)
+* `overruleOnNotBlacklisted`: causes the existence of a single permitted license for an artefact to override the existence of blacklisted licenses for the same artefact (e.g. logback) (default `true`)
 
 Parameter list `blacklistedLicenses` is tricky to configure as some Maven artifacts use different names (e.g. Apache 2.0, Apache Apache License, Version 2.0, Apache Version 2.0, etc...) for the same license.
 For this reason the plugin supports Regex expressions. You can define a regex for a license by prefixing the string with "regex:" like this:
@@ -36,6 +39,9 @@ Plugin configuration example in a project:
         <license>.*Affero.*</license>
       </blacklistedLicenses>
       <failBuildOnBlacklisted>true</failBuildOnBlacklisted>
+      <processPlugins>false</processPlugins>
+			<resolveDependencies>false</resolveDependencies>
+			<overruleOnNotBlacklisted>true</overruleOnNotBlacklisted>
     </configuration>
     <executions>
       <execution>
