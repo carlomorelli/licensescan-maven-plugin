@@ -33,13 +33,13 @@ Plugin configuration example in a project:
       <blacklistedLicenses>
         <license>GNU General Public License, v2.0</license>
         <license>GNU General Public License, v3.0</license>
-        <license>.*Affero.*</license>
+        <license>regex:.*Affero.*</license> <!-- to enable use of wildcards, use string prefix 'regex:' -->
       </blacklistedLicenses>
       <failBuildOnBlacklisted>true</failBuildOnBlacklisted>
     </configuration>
     <executions>
       <execution>
-        <phase>compile</phase> <!-- use your preferred goal, for me it makes sense to do the check at compile time -->
+        <phase>compile</phase> <!-- choose the most relevant goal for your pipeline, e.g. 'compile', 'test' or 'deploy' -->
         <goals>
           <goal>audit</goal>
         </goals>
@@ -61,6 +61,7 @@ If the `<executions/>` block is configured, the plugin will run during your sele
 ```sh
 mvn licensescan:audit
 ```
+
 Let me know if you find this plugin useful!
 
 --Carlo
