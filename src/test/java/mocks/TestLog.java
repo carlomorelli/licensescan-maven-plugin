@@ -1,14 +1,14 @@
 package mocks;
 
-import org.apache.maven.plugin.logging.SystemStreamLog;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.fail;
+import org.apache.maven.plugin.logging.SystemStreamLog;
 
 public class TestLog extends SystemStreamLog {
-    private List<LogRow> logs = new ArrayList();
+    private List<LogRow> logs = new ArrayList<>();
 
     @Override
     public void info(CharSequence content) {
@@ -35,16 +35,16 @@ public class TestLog extends SystemStreamLog {
     }
 
     private void assertNoMessage(String level, String mssg) {
-        for(LogRow l : logs){
-            if(l.level.equals(level) && l.mssg.equals(mssg)){
+        for (LogRow l : logs) {
+            if (l.level.equals(level) && l.mssg.equals(mssg)) {
                 fail("Unwanted log line level: " + level + " message: " + mssg);
             }
         }
     }
 
     private void assertMessage(String level, String mssg) {
-        for(LogRow l : logs){
-            if(l.level.equals(level) && l.mssg.contains(mssg)){
+        for (LogRow l : logs) {
+            if (l.level.equals(level) && l.mssg.contains(mssg)) {
                 return;
             }
         }
@@ -53,8 +53,8 @@ public class TestLog extends SystemStreamLog {
 
     private String getLevelMessages(String level) {
         StringBuffer buffer = new StringBuffer();
-        for(LogRow l : logs){
-            if(l.level.equals(level)){
+        for (LogRow l : logs) {
+            if (l.level.equals(level)) {
                 buffer.append("\n").append("[").append(level).append("] ").append(l.mssg);
             }
         }
@@ -65,7 +65,7 @@ public class TestLog extends SystemStreamLog {
         private final String level;
         private final String mssg;
 
-        public LogRow(String level, String mssg){
+        public LogRow(String level, String mssg) {
             this.level = level;
             this.mssg = mssg;
         }

@@ -1,17 +1,18 @@
 package com.csoft;
 
-import io.takari.maven.testing.TestResources;
-import io.takari.maven.testing.executor.MavenRuntime;
-import io.takari.maven.testing.executor.MavenVersions;
-import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
+import java.io.File;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.File;
+import io.takari.maven.testing.TestResources;
+import io.takari.maven.testing.executor.MavenRuntime;
+import io.takari.maven.testing.executor.MavenVersions;
+import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
 
 @RunWith(MavenJUnitTestRunner.class)
-@MavenVersions({"3.2.3", "3.2.5", "3.6.0"})
+@MavenVersions({ "3.5.4", "3.6.3", "3.8.7" })
 public class IntegrationTest {
     @Rule
     public final TestResources resources = new TestResources();
