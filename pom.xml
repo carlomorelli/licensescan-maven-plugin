@@ -88,6 +88,14 @@
     <tag>HEAD</tag>
   </scm>
 
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages for com.github.carlomorelli</name>
+      <url>https://maven.pkg.github.com/carlomorelli/licensescan-maven-plugin</url>
+    </repository>
+  </distributionManagement>
+
   <build>
     <plugins>
 
