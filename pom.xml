@@ -10,13 +10,14 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
-    <jacoco-maven-plugin.version>0.8.2</jacoco-maven-plugin.version>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+    <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     <maven-coveralls-plugin.version>4.3.0</maven-coveralls-plugin.version>
     <maven-takari-lifecycle-plugin.version>1.13.4</maven-takari-lifecycle-plugin.version>
     <maven.version>3.0.5</maven.version>
     <takari-testing.version>2.8.0</takari-testing.version>
+    <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
  </properties>
 
   <dependencies>
@@ -114,6 +115,11 @@
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
         <version>${maven-coveralls-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
       </plugin>
     </plugins>
   </build>
