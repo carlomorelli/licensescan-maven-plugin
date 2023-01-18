@@ -116,7 +116,7 @@ public class MainMojoTest {
     }
 
     @Test
-    public void regexisNotCaseSensitive() throws Exception {
+    public void regexIsNotCaseSensitive() throws Exception {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0".toUpperCase()),
                 empty);

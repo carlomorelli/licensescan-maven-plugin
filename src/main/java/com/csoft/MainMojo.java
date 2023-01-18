@@ -1,5 +1,12 @@
 package com.csoft;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.License;
@@ -12,23 +19,21 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.*;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import com.csoft.utils.TextUtils;
 
-
-@Mojo(
-        name = "audit",
-        requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME,
-        requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME
-)
+@Mojo(name = "audit", requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class MainMojo extends AbstractMojo {
 
-    @Parameter(defaultValue="${project}", readonly=true, required=true)
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
-    @Parameter(defaultValue="${session}", readonly=true, required=true)
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession session;
 
     @Component
@@ -45,7 +50,7 @@ public class MainMojo extends AbstractMojo {
 
     private final Map<String, List<String>> blacklistedMap = new HashMap<String, List<String>>();
 
-    public MainMojo(){
+    public MainMojo() {
 
     }
 
@@ -77,7 +82,6 @@ public class MainMojo extends AbstractMojo {
             }
         }
 
-
         getLog().info("Found project: " + project);
         getLog().info(" - artifactId          : " + project.getArtifactId());
         getLog().info(" - groupId             : " + project.getGroupId());
@@ -108,7 +112,7 @@ public class MainMojo extends AbstractMojo {
             for (String blacklistedLicense : blacklistedLicenses) {
                 List<String> array = blacklistedMap.get(blacklistedLicense);
                 if (!array.isEmpty()) {
-                    getLog().warn("Found " + array.size() + " violations for license '" + blacklistedLicense +"':");
+                    getLog().warn("Found " + array.size() + " violations for license '" + blacklistedLicense + "':");
                     for (String artifact : array) {
                         getLog().warn(" - " + artifact);
                     }
@@ -128,7 +132,8 @@ public class MainMojo extends AbstractMojo {
 
         try {
             for (Artifact artifact : transitiveDependencies) {
-                String artifactLabel = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ":" + artifact.getScope();
+                String artifactLabel = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
+                        + artifact.getVersion() + ":" + artifact.getScope();
                 getLog().info(" - artifact " + artifactLabel);
                 buildingRequest.setProject(null);
                 MavenProject mavenProject = projectBuilder.build(artifact, buildingRequest).getProject();
@@ -155,10 +160,10 @@ public class MainMojo extends AbstractMojo {
     }
 
     private Match isForbiddenLicense(License license) {
-        for(String entry : blacklistedMap.keySet()){
-            if(entry.startsWith("regex:")){
-                Pattern p = Pattern.compile(entry.replace("regex:",""), Pattern.CASE_INSENSITIVE);
-                if(p.matcher(license.getName()).find()){
+        for (String entry : blacklistedMap.keySet()) {
+            if (entry.startsWith("regex:")) {
+                Pattern p = Pattern.compile(TextUtils.parseAsRegex(entry), Pattern.CASE_INSENSITIVE);
+                if (p.matcher(license.getName()).find()) {
                     return new Match(entry);
                 }
             } else if (entry.equalsIgnoreCase(license.getName())) {
@@ -172,12 +177,12 @@ public class MainMojo extends AbstractMojo {
         final boolean isMatch;
         final String licenseEntry;
 
-        Match(){
+        Match() {
             this.isMatch = false;
             this.licenseEntry = null;
         }
 
-        Match(String licenseEntry){
+        Match(String licenseEntry) {
             this.isMatch = true;
             this.licenseEntry = licenseEntry;
         }
