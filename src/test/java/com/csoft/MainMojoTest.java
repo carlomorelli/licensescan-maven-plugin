@@ -1,7 +1,7 @@
 package com.csoft;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,12 +11,12 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-import io.takari.maven.testing.TestMavenRuntime;
-import io.takari.maven.testing.TestResources;
+import io.takari.maven.testing.TestMavenRuntime5;
+import io.takari.maven.testing.TestResources5;
 import mocks.TestLog;
 import mocks.TestProjectBuilder;
 import mocks.TestUtils;
@@ -27,15 +27,18 @@ public class MainMojoTest {
     private final String regex = "regex:Apache.*Version 1.*";
 
     private final Set<Artifact> empty = Collections.emptySet();
-    @Rule
-    public TestResources testResources = new TestResources();
-    @Rule
-    public final TestMavenRuntime maven = new TestMavenRuntime();
+
+    @RegisterExtension
+    public TestResources5 testResources = new TestResources5();
+
+    @RegisterExtension
+    public final TestMavenRuntime5 maven = new TestMavenRuntime5();
+
     private TestLog log;
     private TestProjectBuilder builder;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void beforeEach() throws Exception {
         builder = new TestProjectBuilder();
     }
 
