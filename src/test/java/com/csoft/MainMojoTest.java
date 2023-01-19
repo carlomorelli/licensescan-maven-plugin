@@ -151,7 +151,7 @@ public class MainMojoTest {
     }
 
     @Test
-    public void doesNotFailUnlessPrintLicensesIsOn() throws Exception {
+    public void failsWhenPrintLicensesIsOn() throws Exception {
         MainMojo mojo = configure(
                 empty,
                 builder.createArtifact("acme", "artifact", "1", badLicense));
