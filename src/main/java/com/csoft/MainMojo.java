@@ -21,6 +21,12 @@ import com.csoft.services.DependencyAnalyzer;
 import com.csoft.services.LicenseScanner;
 import com.csoft.utils.ArtifactUtils;
 
+/**
+ * Main Mojo for the LicenseScan Maven Plugin.
+ * 
+ * (C) 2018-2023 Carlo Morelli
+ * Released with MIT License
+ */
 @Mojo(name = "audit", requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class MainMojo extends AbstractMojo {
 

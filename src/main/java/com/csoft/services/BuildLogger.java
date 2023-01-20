@@ -8,6 +8,10 @@ import org.apache.maven.project.MavenProject;
 
 import com.csoft.utils.ArtifactUtils;
 
+/**
+ * Class that implements the output shown during the build by the LicenseScan
+ * Maven Plugin.
+ */
 public class BuildLogger {
 
     private final MavenProject mavenProject;
@@ -23,6 +27,10 @@ public class BuildLogger {
                 .analyze(ArtifactUtils.getTransitiveDependencies(mavenProject));
     }
 
+    /**
+     * Prints the Header of a LicenseScan, showing all details of the project under
+     * analysis.
+     */
     public void logHeadAnalysis() {
         log.info("Found project: " + mavenProject);
         log.info(" - artifactId          : " + mavenProject.getArtifactId());
@@ -36,10 +44,22 @@ public class BuildLogger {
         log.info(" - getArtifacts.isEmpty: " + mavenProject.getArtifacts().isEmpty());
     }
 
+    /**
+     * Prints the Base Dependencies section of a LicenseScan.
+     * 
+     * @param printLicenses Boolean indicating wheter to print in the output the
+     *                      licenses of each artifact.
+     */
     public void logBaseDeps(final boolean printLicenses) {
         logDeps(dependencyLicensesMap, "BASE DEPENDENCIES", printLicenses);
     }
 
+    /**
+     * Prints the Transitive Dependencies section of a LicenseScan.
+     * 
+     * @param printLicenses Boolean indicating wheter to print in the output the
+     *                      licenses of each artifact.
+     */
     public void logTransitiveDeps(final boolean printLicenses) {
         logDeps(transitiveDependencyLicensesMap, "TRANSITIVE DEPENDENCIES", printLicenses);
     }

@@ -17,9 +17,8 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 
 /**
- * Service that allows to process the dependency space metadata and extract the
- * licenses
- * associated to each artifact.
+ * Class that implements processing of a Maven project dependency metadata and
+ * extracting the licenses associated to each dependency.
  */
 public class DependencyAnalyzer {
 
@@ -32,11 +31,15 @@ public class DependencyAnalyzer {
     }
 
     /**
-     * Scans dependencies in input of type {@link Artifact} and return
-     * all extracted licenses per artifact name in GAV notation.
+     * Scans input set of {@link Artifact} objects derived from a Maven project
+     * and extracts a mapping of all license strings per artifact name in GAV
+     * notation.
      * 
-     * @param dependencies
-     * @return
+     * In a Maven project, an Artifact can have 0, 1 or more licenses associated.
+     * This function allows to extract all the info in a handy Map of Strings.
+     * 
+     * @param dependencies Set of {@link Artifact} objects
+     * @return Map of type {key: artifactGAVLabel, value: listOf[artifact licenses]}
      */
     public Map<String, List<String>> analyze(Set<Artifact> dependencies) {
         ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(

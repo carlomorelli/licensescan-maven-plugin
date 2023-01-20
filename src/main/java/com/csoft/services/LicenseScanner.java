@@ -11,6 +11,10 @@ import org.apache.maven.artifact.Artifact;
 
 import com.csoft.utils.TextUtils;
 
+/**
+ * Class that implements the scanning of licesesToMatch agains the set of found
+ * licenses in a Maven project.
+ */
 public class LicenseScanner {
 
     private final DependencyAnalyzer dependencyAnalyzer;
@@ -23,14 +27,14 @@ public class LicenseScanner {
     }
 
     /**
-     * Compares input licenseMap of type { gavLabel : listOfLicenses } agains the
-     * list of licenses to match.
+     * Compares input set of {@link Artifact} objects derived from a Maven project
+     * agains the list of licenses to match.
      * 
      * Matching can be done either literally at string equality or at regex
      * verification, if the input string begins with 'regex:' label.
      * 
-     * @param licenseMap
-     * @return
+     * @param artifacts Set of {@link Artifact} objects
+     * @return Map of type {key: licenseToMatch, value: listOf[artifact GAV label]}
      */
     public Map<String, List<String>> scan(final Set<Artifact> artifacts) {
 

@@ -43,11 +43,9 @@ public class MainMojoTest {
     }
 
     @Test
-    public void basicTestWithNoDependencies() throws Exception {
+    public void test_WHEN_noForbiddenConfigured_THEN_buildPasses() throws Exception {
         MainMojo mojo = configure(empty, empty);
-
         mojo.execute();
-
         log.assertInfo(" - artifactId          : test-project");
         log.assertInfo(" - groupId             : com.acme.test.co");
         log.assertInfo(" - description         : A nice test pom");
@@ -60,38 +58,19 @@ public class MainMojoTest {
     }
 
     @Test
-    public void passesWithAllGoodLicenses() throws Exception {
+    public void test_WHEN_noArtifactForbidden_THEN_buildPasses() throws Exception {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "main", "2", goodLicense),
                 builder.createArtifact("acme", "artifact", "1", goodLicense));
-
         mojo.execute();
-
         log.assertNoWarning("Found 1 violations for license 'Bad Banned License v2':");
     }
 
     @Test
-    public void willFailWhenBannedLicenseShowsUpInTransient() throws Exception {
-        MainMojo mojo = configure(
-                empty,
-                builder.createArtifact("acme", "artifact", "1", badLicense));
-
-        try {
-            mojo.execute();
-            fail("should have thrown error");
-        } catch (MojoFailureException e) {
-            assertEquals("Failing build", e.getMessage());
-            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
-            log.assertWarning(" - acme:artifact:1:null");
-        }
-    }
-
-    @Test
-    public void doesFailOnDirectDependencies() throws Exception {
+    public void test_WHEN_artifactForbiddenInDirectDeps_THEN_buildFails() throws Exception {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", badLicense),
                 empty);
-
         try {
             mojo.execute();
             fail("should have thrown error");
@@ -103,11 +82,41 @@ public class MainMojoTest {
     }
 
     @Test
-    public void canUseRegex() throws Exception {
+    public void test_WHEN_artifactForbiddenInTransitiveDeps_THEN_buildFails() throws Exception {
+        MainMojo mojo = configure(
+                empty,
+                builder.createArtifact("acme", "artifact", "1", badLicense));
+        try {
+            mojo.execute();
+            fail("should have thrown error");
+        } catch (MojoFailureException e) {
+            assertEquals("Failing build", e.getMessage());
+            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
+            log.assertWarning(" - acme:artifact:1:null");
+        }
+    }
+
+    @Test
+    public void test_WHEN_artifactForbiddenInBothDeps_THEN_buildFails()
+            throws Exception {
+        MainMojo mojo = configure(
+                builder.createArtifact("acme", "artifact", "1", badLicense),
+                builder.createArtifact("acme", "artifact", "1", badLicense));
+        try {
+            mojo.execute();
+            fail("should have thrown error");
+        } catch (MojoFailureException e) {
+            assertEquals("Failing build", e.getMessage());
+            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
+            log.assertWarning(" - acme:artifact:1:null");
+        }
+    }
+
+    @Test
+    public void test_WHEN_artifactForbiddenWithRegex_THEN_buildFails() throws Exception {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0"),
                 builder.createArtifact("acme", "else", "1", "Apache License, Version 2.0"));
-
         try {
             mojo.execute();
             fail("should have thrown error");
@@ -119,11 +128,10 @@ public class MainMojoTest {
     }
 
     @Test
-    public void regexIsNotCaseSensitive() throws Exception {
+    public void test_WHEN_artifactForbiddenWithRegexWithAllCaps_THEN_buildFails() throws Exception {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0".toUpperCase()),
                 empty);
-
         try {
             mojo.execute();
             fail("should have thrown error");
@@ -135,29 +143,11 @@ public class MainMojoTest {
     }
 
     @Test
-    public void doesNotAnalyzePrimaryDependenciesAsTransient() throws Exception {
-        MainMojo mojo = configure(
-                builder.createArtifact("acme", "artifact", "1", badLicense),
-                builder.createArtifact("acme", "artifact", "1", badLicense));
-
-        try {
-            mojo.execute();
-            fail("should have thrown error");
-        } catch (MojoFailureException e) {
-            assertEquals("Failing build", e.getMessage());
-            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
-            log.assertWarning(" - acme:artifact:1:null");
-        }
-    }
-
-    @Test
-    public void failsWhenPrintLicensesIsOn() throws Exception {
+    public void test_WHEN_printLicensesIsOff_THEN_buildFails() throws Exception {
         MainMojo mojo = configure(
                 empty,
                 builder.createArtifact("acme", "artifact", "1", badLicense));
-
         mojo.setPrintLicenses(false);
-
         try {
             mojo.execute();
             fail("should have thrown error");
