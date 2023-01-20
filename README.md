@@ -1,10 +1,8 @@
 # LicenseScan Maven Plugin
 
-[![](https://jitpack.io/v/carlomorelli/licensescan-maven-plugin.svg)](https://jitpack.io/#carlomorelli/licensescan-maven-plugin)
+[![licensescan-maven-plugin](https://jitpack.io/v/carlomorelli/licensescan-maven-plugin.svg)](https://jitpack.io/#carlomorelli/licensescan-maven-plugin)
 
-[![Build Status](https://travis-ci.org/carlomorelli/licensescan-maven-plugin.svg?branch=master)](https://travis-ci.org/carlomorelli/licensescan-maven-plugin)
-
-![CI pipeline](https://github.com/carlomorelli/licensescan-maven-plugin/workflows/CI%20pipeline/badge.svg)
+![CI pipeline](https://github.com/carlomorelli/licensescan-maven-plugin/workflows/maven.yml/badge.svg)
 
 [![Coverage Status](https://coveralls.io/repos/github/carlomorelli/licensescan-maven-plugin/badge.svg?branch=master)](https://coveralls.io/github/carlomorelli/licensescan-maven-plugin?branch=master)
 
