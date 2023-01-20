@@ -68,7 +68,7 @@ public class BuildLogger {
             final String titleLabel,
             final boolean printLicenses) {
         log.info("");
-        log.info("BASE DEPENDENCIES");
+        log.info(titleLabel);
         log.info("-----------------------");
         for (String gavLabel : licensesMap.keySet()) {
             log.info(" - artifact " + gavLabel);

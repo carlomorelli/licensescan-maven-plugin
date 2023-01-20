@@ -48,16 +48,33 @@ public class LicenseScanner {
 
         // scan input map for matches
         for (Map.Entry<String, List<String>> entry : licenseMap.entrySet()) {
-            String gavLabel = entry.getKey();
-            List<String> licenseList = entry.getValue();
-            for (String license : licenseList) {
-                Match forbiddenMatch = matchOf(license);
-                if (forbiddenMatch.isMatch) {
-                    List<String> array = returnMap.get(forbiddenMatch.licenseEntry);
-                    array.add(gavLabel);
-                    returnMap.put(forbiddenMatch.licenseEntry, array);
+            String artifactGavLabel = entry.getKey();
+            List<String> artifactLicenses = entry.getValue();
+
+            // collect all Match results for all the licenses attached to the artifact
+            boolean cumulativeIsMatch = true;
+            List<Match> forbiddenMatches = new ArrayList<>();
+            for (String artifactLicense : artifactLicenses) {
+                Match forbiddenMatch = matchOf(artifactLicense);
+                forbiddenMatches.add(forbiddenMatch);
+                cumulativeIsMatch = cumulativeIsMatch && forbiddenMatch.isMatch;
+            }
+
+            // only if all licenses of the artifact are a match, record the license stats in
+            // the return map; otherwise, it means that at least one license attached to the
+            // artifact is not forbidden, and we shouldn't record it in the return map.
+            if (cumulativeIsMatch) {
+                List<String> forbiddenLicensesFound = new ArrayList<>();
+                for (Match forbiddenMatch : forbiddenMatches) {
+                    forbiddenLicensesFound.add(forbiddenMatch.licenseEntry);
+                }
+                for (String forbiddenLicense : forbiddenLicensesFound) {
+                    List<String> array = returnMap.get(forbiddenLicense);
+                    array.add(artifactGavLabel);
+                    returnMap.put(forbiddenLicense, array);
                 }
             }
+
         }
         return returnMap;
     }
