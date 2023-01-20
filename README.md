@@ -2,7 +2,7 @@
 
 [![licensescan-maven-plugin](https://jitpack.io/v/carlomorelli/licensescan-maven-plugin.svg)](https://jitpack.io/#carlomorelli/licensescan-maven-plugin)
 
-![CI pipeline](https://github.com/carlomorelli/licensescan-maven-plugin/workflows/maven.yml/badge.svg)
+![CI pipeline](https://github.com/carlomorelli/licensescan-maven-plugin/actions/workflows/maven.yml/badge.svg)
 
 [![Coverage Status](https://coveralls.io/repos/github/carlomorelli/licensescan-maven-plugin/badge.svg?branch=master)](https://coveralls.io/github/carlomorelli/licensescan-maven-plugin?branch=master)
 

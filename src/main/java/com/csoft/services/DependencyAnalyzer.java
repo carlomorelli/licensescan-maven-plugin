@@ -41,7 +41,7 @@ public class DependencyAnalyzer {
      * @param dependencies Set of {@link Artifact} objects
      * @return Map of type {key: artifactGAVLabel, value: listOf[artifact licenses]}
      */
-    public Map<String, List<String>> analyze(Set<Artifact> dependencies) {
+    public Map<String, List<String>> analyze(final Set<Artifact> dependencies) {
         ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(
                 mavenSession.getProjectBuildingRequest());
         buildingRequest.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);

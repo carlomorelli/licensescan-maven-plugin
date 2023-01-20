@@ -143,6 +143,15 @@ public class MainMojoTest {
     }
 
     @Test
+    public void test_WHEN_artifactForbiddenButWithDualLicense_THEN_buildPasses() throws Exception {
+        MainMojo mojo = configure(
+                builder.createArtifact("acme", "artifact", "1", badLicense, goodLicense),
+                empty);
+        mojo.execute();
+        log.assertNoWarning("Found 1 violations for license 'Bad Banned License v2':");
+    }
+
+    @Test
     public void test_WHEN_printLicensesIsOff_THEN_buildFails() throws Exception {
         MainMojo mojo = configure(
                 empty,

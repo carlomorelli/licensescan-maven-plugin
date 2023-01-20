@@ -51,7 +51,7 @@ public class MainMojo extends AbstractMojo {
     public MainMojo() {
     }
 
-    public MainMojo(MavenProject proj, MavenSession session, ProjectBuilder builder, Log log) {
+    public MainMojo(final MavenProject proj, final MavenSession session, final ProjectBuilder builder, final Log log) {
         setLog(log);
         this.project = proj;
         this.session = session;
