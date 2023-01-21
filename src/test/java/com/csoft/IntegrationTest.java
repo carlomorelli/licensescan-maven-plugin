@@ -2,6 +2,7 @@ package com.csoft;
 
 import java.io.File;
 
+import io.takari.maven.testing.executor.MavenExecutionResult;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.takari.maven.testing.TestResources5;
@@ -24,17 +25,23 @@ public class IntegrationTest {
     public void test_Success() throws Exception {
         File basedir = resources.getBasedir("integration_pass");
         System.out.println(basedir.getAbsolutePath());
-        maven.forProject(basedir)
-                .execute("licensescan:audit")
-                .assertErrorFreeLog();
+        MavenExecutionResult result = maven.forProject(basedir)
+                .execute("licensescan:audit");
+        for (String logLine : result.getLog()) {
+            System.out.println(logLine);
+        }
+        result.assertErrorFreeLog();
     }
 
     @MavenPluginTest
     public void test_Fail() throws Exception {
         File basedir = resources.getBasedir("integration_fail");
         System.out.println(basedir.getAbsolutePath());
-        maven.forProject(basedir)
-                .execute("licensescan:audit")
-                .assertLogText("[ERROR]");
+        MavenExecutionResult result = maven.forProject(basedir)
+                .execute("licensescan:audit");
+        for (String logLine : result.getLog()) {
+            System.out.println(logLine);
+        }
+        result.assertLogText("[ERROR]");
     }
 }

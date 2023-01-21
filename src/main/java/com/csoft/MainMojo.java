@@ -96,6 +96,7 @@ public class MainMojo extends AbstractMojo {
             log.info("");
             log.warn("BLACKLIST");
             log.warn("-----------------------");
+            log.info("NOTE: For artifacts with multiple licenses, violation will be marked only when all licenses match the denylist.");
             for (String blacklistedLicense : blacklistedLicenses) {
                 List<String> array = forbiddenMap.get(blacklistedLicense);
                 // if (!array.isEmpty()) {
