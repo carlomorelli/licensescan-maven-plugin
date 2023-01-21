@@ -23,7 +23,7 @@ To attach the plugin to your Maven project, add the following block in your `pom
     <plugin>
       <groupId>com.github.carlomorelli</groupId>
       <artifactId>licensescan-maven-plugin</artifactId>
-      <version>3.0-RC3</version> <!-- check the latest version -->
+      <version>3.0</version> <!-- check the latest version -->
       <configuration>
         <printLicenses>true</printLicenses>
         <blacklistedLicenses>

@@ -9,7 +9,7 @@ import io.takari.maven.testing.executor.MavenRuntime;
 import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.junit.MavenPluginTest;
 
-@MavenVersions({ "3.8.7" })
+@MavenVersions({"3.8.7"})
 public class IntegrationTest {
     @RegisterExtension
     public final TestResources5 resources = new TestResources5();

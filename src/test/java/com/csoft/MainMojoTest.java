@@ -1,12 +1,10 @@
 package com.csoft;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
-
+import io.takari.maven.testing.TestMavenRuntime5;
+import io.takari.maven.testing.TestResources5;
+import mocks.TestLog;
+import mocks.TestProjectBuilder;
+import mocks.TestUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoFailureException;
@@ -15,11 +13,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import io.takari.maven.testing.TestMavenRuntime5;
-import io.takari.maven.testing.TestResources5;
-import mocks.TestLog;
-import mocks.TestProjectBuilder;
-import mocks.TestUtils;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class MainMojoTest {
     private final String goodLicense = "Happy Freedom License v1";
@@ -38,7 +37,7 @@ public class MainMojoTest {
     private TestProjectBuilder builder;
 
     @BeforeEach
-    public void beforeEach() throws Exception {
+    public void beforeEach() {
         builder = new TestProjectBuilder();
     }
 
@@ -143,12 +142,27 @@ public class MainMojoTest {
     }
 
     @Test
-    public void test_WHEN_artifactForbiddenButWithDualLicense_THEN_buildPasses() throws Exception {
+    public void test_WHEN_artifactDualLicensedAndOnlyOneForbidden_THEN_buildPasses() throws Exception {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", badLicense, goodLicense),
                 empty);
         mojo.execute();
         log.assertNoWarning("Found 1 violations for license 'Bad Banned License v2':");
+    }
+
+    @Test
+    public void test_WHEN_artifactDualLicensedAndBothForbidden_THEN_buildFails() throws Exception {
+        MainMojo mojo = configure(
+                builder.createArtifact("acme", "artifact", "1", badLicense, "Apache, Version 1.0"),
+                empty);
+        try {
+            mojo.execute();
+            fail("should have thrown error");
+        } catch (MojoFailureException e) {
+            assertEquals("Failing build", e.getMessage());
+            log.assertWarning("Found 1 violations for license 'regex:Apache.*Version 1.*':");
+            log.assertWarning(" - acme:artifact:1:null");
+        }
     }
 
     @Test
@@ -168,7 +182,7 @@ public class MainMojoTest {
     }
 
     private MainMojo configure(Set<Artifact> primaryArtifacts,
-            Set<Artifact> transientArtifacts) {
+                               Set<Artifact> transientArtifacts) {
         try {
             MavenProject proj = maven.readMavenProject(testResources.getBasedir("basic"));
             proj.setArtifacts(TestUtils.union(primaryArtifacts, transientArtifacts));

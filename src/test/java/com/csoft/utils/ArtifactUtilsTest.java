@@ -28,7 +28,7 @@ public class ArtifactUtilsTest {
     @Test
     public void testGetTransitiveDependencies_WHEN_inputHasNoDeps_THEN_returnsEmptySet() {
         when(mavenProject.getArtifacts()).thenReturn(new HashSet<Artifact>());
-        when(mavenProject.getDependencyArtifacts()).thenReturn(new HashSet<Artifact>());     
+        when(mavenProject.getDependencyArtifacts()).thenReturn(new HashSet<Artifact>());
         Set<Artifact> artifacts = ArtifactUtils.getTransitiveDependencies(mavenProject);
         assertTrue(artifacts.isEmpty());
         verify(mavenProject, times(1)).getArtifacts();

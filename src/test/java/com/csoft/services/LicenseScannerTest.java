@@ -45,9 +45,9 @@ public class LicenseScannerTest {
         licenseScanner = new LicenseScanner(dependencyAnalyzer, licensesToMatch);
         Map<String, List<String>> result = licenseScanner.scan(new HashSet<Artifact>());
         assertEquals(3, result.keySet().size());
-        assertTrue(result.keySet().contains("licenseA"));
-        assertTrue(result.keySet().contains("licenseB"));
-        assertTrue(result.keySet().contains("regex:.*\tlicC.*"));
+        assertTrue(result.containsKey("licenseA"));
+        assertTrue(result.containsKey("licenseB"));
+        assertTrue(result.containsKey("regex:.*\tlicC.*"));
         for (Map.Entry<String, List<String>> entry : result.entrySet()) {
             assertTrue(entry.getValue().isEmpty());
         }
@@ -55,14 +55,14 @@ public class LicenseScannerTest {
     }
 
     @Test
-    public void testScan_WHEN_licensesToMatchExistAndSomeMatchesArtifactsWithSingleLicense_THEN_returnsMapWithNonEmptyValueList() {
+    public void testScan_WHEN_licensesToMatchExistAndSomeMatchesArtifactsWithSingleLicense_THEN_returnsMapWithArtifactGavLabel() {
         List<String> licensesToMatch = Arrays.asList("licenseA", "license1", "licenseB", "license2");
         when(dependencyAnalyzer.analyze(ArgumentMatchers.<Artifact>anySet())).thenReturn(analyzeMap());
         licenseScanner = new LicenseScanner(dependencyAnalyzer, licensesToMatch);
         Map<String, List<String>> result = licenseScanner.scan(new HashSet<Artifact>());
         assertEquals(4, result.keySet().size());
-        assertTrue(result.keySet().contains("license1"));
-        assertTrue(result.keySet().contains("license2"));
+        assertTrue(result.containsKey("license1"));
+        assertTrue(result.containsKey("license2"));
         for (Map.Entry<String, List<String>> entry : result.entrySet()) {
             if (entry.getKey().equals("license1")) {
                 assertEquals(1, entry.getValue().size());
@@ -84,10 +84,34 @@ public class LicenseScannerTest {
         licenseScanner = new LicenseScanner(dependencyAnalyzer, licensesToMatch);
         Map<String, List<String>> result = licenseScanner.scan(new HashSet<Artifact>());
         assertEquals(2, result.keySet().size());
-        assertTrue(result.keySet().contains("licenseA"));
-        assertTrue(result.keySet().contains("license31"));
+        assertTrue(result.containsKey("licenseA"));
+        assertTrue(result.containsKey("license31"));
         for (Map.Entry<String, List<String>> entry : result.entrySet()) {
             assertTrue(entry.getValue().isEmpty());
+        }
+        verify(dependencyAnalyzer, times(1)).analyze(ArgumentMatchers.<Artifact>anySet());
+    }
+
+    @Test
+    public void testScan_WHEN_licensesToMatchExistAndSomeMatchCompletelyArtifactsWithMultipleLicense_returnsMapWithArtifactGavLabel() {
+        List<String> licensesToMatch = Arrays.asList("licenseA", "license31", "license32");
+        when(dependencyAnalyzer.analyze(ArgumentMatchers.<Artifact>anySet())).thenReturn(analyzeMap());
+        licenseScanner = new LicenseScanner(dependencyAnalyzer, licensesToMatch);
+        Map<String, List<String>> result = licenseScanner.scan(new HashSet<Artifact>());
+        assertEquals(3, result.keySet().size());
+        assertTrue(result.containsKey("licenseA"));
+        assertTrue(result.containsKey("license31"));
+        assertTrue(result.containsKey("license32"));
+        for (Map.Entry<String, List<String>> entry : result.entrySet()) {
+            if (entry.getKey().equals("license31")) {
+                assertEquals(1, entry.getValue().size());
+                assertEquals("group3:artifact3:3.0:null", entry.getValue().get(0));
+            } else if (entry.getKey().equals("license32")) {
+                assertEquals(1, entry.getValue().size());
+                assertEquals("group3:artifact3:3.0:null", entry.getValue().get(0));
+            } else {
+                assertTrue(entry.getValue().isEmpty());
+            }
         }
         verify(dependencyAnalyzer, times(1)).analyze(ArgumentMatchers.<Artifact>anySet());
     }
@@ -99,7 +123,6 @@ public class LicenseScannerTest {
         // this is used to test partial match; if an artifact has multiple licenses but
         // only one forbidden, don't mark it as forbidden
         analyzeMap.put("group3:artifact3:3.0:null", Arrays.asList("license31", "license32"));
-
         return analyzeMap;
     }
 }

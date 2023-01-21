@@ -46,7 +46,7 @@ public class BuildLogger {
 
     /**
      * Prints the Base Dependencies section of a LicenseScan.
-     * 
+     *
      * @param printLicenses Boolean indicating wheter to print in the output the
      *                      licenses of each artifact.
      */
@@ -56,7 +56,7 @@ public class BuildLogger {
 
     /**
      * Prints the Transitive Dependencies section of a LicenseScan.
-     * 
+     *
      * @param printLicenses Boolean indicating wheter to print in the output the
      *                      licenses of each artifact.
      */
@@ -65,8 +65,8 @@ public class BuildLogger {
     }
 
     private void logDeps(final Map<String, List<String>> licensesMap,
-            final String titleLabel,
-            final boolean printLicenses) {
+                         final String titleLabel,
+                         final boolean printLicenses) {
         log.info("");
         log.info(titleLabel);
         log.info("-----------------------");
