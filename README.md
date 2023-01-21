@@ -87,7 +87,9 @@ A denylisted license can be either indicated with a flat string (that will then 
 
 ## Development
 For code contributions, plase check `CONTRIBUTING.md`. Setting up a developer environment is straightforward:
-1. Have any JDK installed with minimum version 1.7 and maximum version 17 (because newer versions won't have bytecode support for 1.7)
+1. Have any JDK installed with:
+  * minimum version 11 (due to Takari platform requirement)
+  * maxium version 17 (because newer versions won't have bytecode support for 1.7)
 2. Have Maven 3.x series installed
 3. Clone the repository
 4. Build with `mvn clean package`.
