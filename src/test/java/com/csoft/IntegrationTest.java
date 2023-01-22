@@ -28,7 +28,7 @@ public class IntegrationTest {
         MavenExecutionResult result = maven.forProject(basedir)
                 .execute("licensescan:audit");
         for (String logLine : result.getLog()) {
-            System.out.println(logLine);
+            System.out.println("[INT-TEST]" + logLine);
         }
         result.assertErrorFreeLog();
     }
@@ -40,7 +40,7 @@ public class IntegrationTest {
         MavenExecutionResult result = maven.forProject(basedir)
                 .execute("licensescan:audit");
         for (String logLine : result.getLog()) {
-            System.out.println(logLine);
+            System.out.println("[INT-TEST]" + logLine);
         }
         result.assertLogText("[ERROR]");
     }

@@ -41,7 +41,7 @@
             <plugin>
                 <groupId>com.github.carlomorelli</groupId>
                 <artifactId>licensescan-maven-plugin</artifactId>
-                <version>3.0-RC3</version>
+                <version>3.0</version>
                 <configuration>
                     <printLicenses>true</printLicenses>
                     <blacklistedLicenses>
