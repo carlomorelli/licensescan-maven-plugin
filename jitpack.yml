@@ -1,2 +1,3 @@
+#OpenJdk11 required due to Takari plugin restriction
 jdk:
   - openjdk11

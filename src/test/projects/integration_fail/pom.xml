@@ -27,6 +27,12 @@
             <artifactId>commons-validator</artifactId>
             <version>1.6</version>
         </dependency>
+        <!-- this artifact is dual-licensed with EPL2.0 and GPL2.0 with Classpath ex. -->
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <version>2.0.1</version>
+        </dependency>
     </dependencies>
 
 
@@ -35,12 +41,20 @@
             <plugin>
                 <groupId>com.github.carlomorelli</groupId>
                 <artifactId>licensescan-maven-plugin</artifactId>
-                <version>2.2</version>
+                <version>3.0</version>
                 <configuration>
                     <printLicenses>true</printLicenses>
                     <blacklistedLicenses>
+                        <!-- never shows up in the artifact space -->
                         <license>Apache License, Version 1.0</license>
+
+                        <!-- has 2 occurrences in the artifact space -->
                         <license>Apache License, Version 2.0</license>
+
+                        <!-- these two regex will allow to declare json-api artifact as forbidden -->
+                        <license>Eclipse Public License 2.0</license>
+                        <license>regex:.*Classpath Exception.*</license>
+
                     </blacklistedLicenses>
                     <failBuildOnBlacklisted>true</failBuildOnBlacklisted>
                 </configuration>

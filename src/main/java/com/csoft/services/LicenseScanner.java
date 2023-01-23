@@ -21,7 +21,7 @@ public class LicenseScanner {
     private final List<String> licensesToMatch;
 
     public LicenseScanner(final DependencyAnalyzer dependencyAnalyzer,
-            final List<String> licensesToMatch) {
+                          final List<String> licensesToMatch) {
         this.dependencyAnalyzer = dependencyAnalyzer;
         this.licensesToMatch = licensesToMatch;
     }
@@ -29,10 +29,10 @@ public class LicenseScanner {
     /**
      * Compares input set of {@link Artifact} objects derived from a Maven project
      * agains the list of licenses to match.
-     * 
+     * <p>
      * Matching can be done either literally at string equality or at regex
      * verification, if the input string begins with 'regex:' label.
-     * 
+     *
      * @param artifacts Set of {@link Artifact} objects
      * @return Map of type {key: licenseToMatch, value: listOf[artifact GAV label]}
      */

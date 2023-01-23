@@ -4,10 +4,12 @@ import org.apache.commons.text.StringEscapeUtils;
 
 public class TextUtils {
 
+    private TextUtils() {}
+
     /**
      * Parses a regex, removes the prefix :regex if found, and returns the
      * XML-unescaped version.
-     * 
+     *
      * @param text Input string containing a regex.
      * @return Unescaped string with prefix :regex removed.
      */

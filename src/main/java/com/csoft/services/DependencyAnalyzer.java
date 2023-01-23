@@ -34,10 +34,10 @@ public class DependencyAnalyzer {
      * Scans input set of {@link Artifact} objects derived from a Maven project
      * and extracts a mapping of all license strings per artifact name in GAV
      * notation.
-     * 
+     * <p>
      * In a Maven project, an Artifact can have 0, 1 or more licenses associated.
      * This function allows to extract all the info in a handy Map of Strings.
-     * 
+     *
      * @param dependencies Set of {@link Artifact} objects
      * @return Map of type {key: artifactGAVLabel, value: listOf[artifact licenses]}
      */

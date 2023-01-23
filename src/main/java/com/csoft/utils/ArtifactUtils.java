@@ -7,10 +7,12 @@ import org.apache.maven.project.MavenProject;
 
 public class ArtifactUtils {
 
+    private ArtifactUtils() {}
+
     /**
      * Extracts the set of Transitive {@link Artifact} dependencies from a input
      * {@link MavenProject}.
-     * 
+     *
      * @param mavenProject The input project.
      * @return Set of dependencies.
      */
@@ -23,7 +25,7 @@ public class ArtifactUtils {
     /**
      * Extracts the set of All {@link Artifact} dependencies (Direct + Transitive)
      * from a input {@link MavenProject}.
-     * 
+     *
      * @param mavenProject The input project.
      * @return Set of dependencies.
      */

@@ -23,11 +23,15 @@ import com.csoft.utils.ArtifactUtils;
 
 /**
  * Main Mojo for the LicenseScan Maven Plugin.
- * 
+ * <p>
  * (C) 2018-2023 Carlo Morelli
  * Released with MIT License
  */
-@Mojo(name = "audit", requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
+@Mojo(
+        name = "audit",
+        requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME,
+        requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME
+)
 public class MainMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
@@ -51,12 +55,15 @@ public class MainMojo extends AbstractMojo {
     public MainMojo() {
     }
 
-    public MainMojo(final MavenProject proj, final MavenSession session, final ProjectBuilder builder, final Log log) {
+    public MainMojo(final MavenProject proj,
+                    final MavenSession session,
+                    final ProjectBuilder builder,
+                    final Log log) {
         setLog(log);
         this.project = proj;
         this.session = session;
         this.projectBuilder = builder;
-        this.blacklistedLicenses = new ArrayList<String>();
+        this.blacklistedLicenses = new ArrayList<>();
     }
 
     public void setPrintLicenses(boolean printLicenses) {
@@ -93,6 +100,7 @@ public class MainMojo extends AbstractMojo {
             log.info("");
             log.warn("BLACKLIST");
             log.warn("-----------------------");
+            log.info("NOTE: For artifacts with multiple licenses, violation will be marked only when all licenses match the denylist.");
             for (String blacklistedLicense : blacklistedLicenses) {
                 List<String> array = forbiddenMap.get(blacklistedLicense);
                 // if (!array.isEmpty()) {
