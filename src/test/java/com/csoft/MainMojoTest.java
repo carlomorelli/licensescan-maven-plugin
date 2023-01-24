@@ -191,8 +191,8 @@ public class MainMojoTest {
             log = new TestLog();
             MainMojo mainMojo = new MainMojo(proj, session, builder, log);
             mainMojo.setPrintLicenses(true);
-            mainMojo.setFailBuildOnBlacklisted(true);
-            mainMojo.setBlacklistedLicenses(Arrays.asList(badLicense, regex));
+            mainMojo.setFailBuildOnViolation(true);
+            mainMojo.setForbiddenLicenses(Arrays.asList(badLicense, regex));
             return mainMojo;
         } catch (Exception e) {
             throw new RuntimeException(e);

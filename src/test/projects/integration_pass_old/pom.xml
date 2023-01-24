@@ -21,10 +21,17 @@
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
         <dependency>
-            <groupId>com.acme</groupId>
-            <artifactId>big-framework</artifactId>
-            <version>1.2.3</version>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <!-- this artifact is dual-licensed with EPL2.0 and GPL2.0 with Classpath ex. -->
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <version>2.0.1</version>
         </dependency>
     </dependencies>
 
@@ -37,12 +44,14 @@
                 <version>3.0</version>
                 <configuration>
                     <printLicenses>true</printLicenses>
-                    <forbiddenLicenses>
+                    <blacklistedLicenses>
+                        <!-- these two licenses never show up in the artifact space -->
                         <license>Banned License v1</license>
                         <license>Banned License v2</license>
-                        <license>regex:Apache.*Version 1.*</license>
-                    </forbiddenLicenses>
-                    <failBuildOnViolation>true</failBuildOnViolation>
+                        <!-- we catch only one of the two licenses of the json-api artifact, so build should not fail overall -->
+                        <license>Eclipse Public License 2.0</license>
+                    </blacklistedLicenses>
+                    <failBuildOnBlacklisted>true</failBuildOnBlacklisted>
                 </configuration>
                 <executions>
                     <execution>

@@ -44,14 +44,14 @@
                 <version>3.0</version>
                 <configuration>
                     <printLicenses>true</printLicenses>
-                    <blacklistedLicenses>
+                    <forbiddenLicenses>
                         <!-- these two licenses never show up in the artifact space -->
                         <license>Banned License v1</license>
                         <license>Banned License v2</license>
                         <!-- we catch only one of the two licenses of the json-api artifact, so build should not fail overall -->
                         <license>Eclipse Public License 2.0</license>
-                    </blacklistedLicenses>
-                    <failBuildOnBlacklisted>true</failBuildOnBlacklisted>
+                    </forbiddenLicenses>
+                    <failBuildOnViolation>true</failBuildOnViolation>
                 </configuration>
                 <executions>
                     <execution>

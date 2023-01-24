@@ -46,11 +46,11 @@ public class MainMojo extends AbstractMojo {
     @Parameter(property = "printLicenses", defaultValue = "false")
     private boolean printLicenses;
 
-    @Parameter(property = "blacklistedLicenses")
-    private List<String> blacklistedLicenses;
+    @Parameter(property = "forbiddenLicenses", alias = "blacklistedLicenses")
+    private List<String> forbiddenLicenses;
 
-    @Parameter(property = "failBuildOnBlacklisted", defaultValue = "false")
-    private boolean failBuildOnBlacklisted;
+    @Parameter(property = "failBuildOnViolation", alias = "failBuildOnBlacklisted", defaultValue = "false")
+    private boolean failBuildOnViolation;
 
     public MainMojo() {
     }
@@ -63,26 +63,27 @@ public class MainMojo extends AbstractMojo {
         this.project = proj;
         this.session = session;
         this.projectBuilder = builder;
-        this.blacklistedLicenses = new ArrayList<>();
+        this.forbiddenLicenses = new ArrayList<>();
     }
 
     public void setPrintLicenses(boolean printLicenses) {
         this.printLicenses = printLicenses;
     }
 
-    public void setBlacklistedLicenses(List<String> blacklistedLicenses) {
-        this.blacklistedLicenses = blacklistedLicenses;
+    public void setForbiddenLicenses(List<String> forbiddenLicenses) {
+        this.forbiddenLicenses = forbiddenLicenses;
     }
 
-    public void setFailBuildOnBlacklisted(boolean failBuildOnBlacklisted) {
-        this.failBuildOnBlacklisted = failBuildOnBlacklisted;
+    public void setFailBuildOnViolation(boolean failBuildOnViolation) {
+        this.failBuildOnViolation = failBuildOnViolation;
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        DependencyAnalyzer dependencyAnalizer = new DependencyAnalyzer(session, projectBuilder);
-        LicenseScanner licenseScanner = new LicenseScanner(dependencyAnalizer, blacklistedLicenses);
-        BuildLogger buildLogger = new BuildLogger(dependencyAnalizer, project, getLog());
+        printWarning();
+        DependencyAnalyzer dependencyAnalyzer = new DependencyAnalyzer(session, projectBuilder);
+        LicenseScanner licenseScanner = new LicenseScanner(dependencyAnalyzer, forbiddenLicenses);
+        BuildLogger buildLogger = new BuildLogger(dependencyAnalyzer, project, getLog());
 
         buildLogger.logHeadAnalysis();
         buildLogger.logBaseDeps(printLicenses);
@@ -96,15 +97,16 @@ public class MainMojo extends AbstractMojo {
     private void failBuild(final Map<String, List<String>> forbiddenMap) throws MojoFailureException {
         Log log = getLog();
         boolean potentiallyFailBuild = false;
-        if (blacklistedLicenses != null && !blacklistedLicenses.isEmpty()) {
+        if (forbiddenLicenses != null && !forbiddenLicenses.isEmpty()) {
             log.info("");
-            log.warn("BLACKLIST");
+            log.warn("FORBIDDEN LICENSES");
             log.warn("-----------------------");
-            log.info("NOTE: For artifacts with multiple licenses, violation will be marked only when all licenses match the denylist.");
-            for (String blacklistedLicense : blacklistedLicenses) {
-                List<String> array = forbiddenMap.get(blacklistedLicense);
+            log.info(
+                    "NOTE: For artifacts with multiple licenses, violation will be marked only when all licenses match the denylist.");
+            for (String forbiddenLicense : forbiddenLicenses) {
+                List<String> array = forbiddenMap.get(forbiddenLicense);
                 // if (!array.isEmpty()) {
-                log.warn("Found " + array.size() + " violations for license '" + blacklistedLicense + "':");
+                log.warn("Found " + array.size() + " violations for license '" + forbiddenLicense + "':");
                 for (String artifact : array) {
                     log.warn(" - " + artifact);
                 }
@@ -112,9 +114,17 @@ public class MainMojo extends AbstractMojo {
                     potentiallyFailBuild = true;
                 }
             }
-            if (failBuildOnBlacklisted && potentiallyFailBuild) {
+            if (failBuildOnViolation && potentiallyFailBuild) {
                 throw new MojoFailureException("Failing build");
             }
         }
+    }
+
+    private void printWarning() {
+        Log log = getLog();
+        log.warn("+--------------------------------------------------------------------------------------------------------+");
+        log.warn("| Usage of configuration terms 'blacklistedLicenses' and 'failBuildOnBlacklisted' is deprecated, and it  |");
+        log.warn("| will be removed in the next major release. Use 'forbiddenLicenses' and 'failBuildOnViolation' instead. |");
+        log.warn("+--------------------------------------------------------------------------------------------------------+");
     }
 }
