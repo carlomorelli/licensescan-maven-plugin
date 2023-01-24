@@ -74,7 +74,7 @@ $ mvn clean package licensescan:audit
 * `printLicenses`: prints the scanned licenses during the build (default `false`);
 * `forbiddenLicenses`: the _denylist_ of licenses that the plugin will alert when found;
 * `failBuildOnViolation`: if `forbiddenLicenses` are configured and at least an overall violation is found, makes the build fail (default `false`);
-* (**deprecated**) `blacklistedLicenses::wq`: alias for `forbiddenLicenses`; DO NOT USE, will be removed with Release 4.0
+* (**deprecated**) `blacklistedLicenses`: alias for `forbiddenLicenses`; DO NOT USE, will be removed with Release 4.0
 * (**deprecated**) `failBuildOnBlacklisted`: alias for `failBuildOnViolation`; DO NOT USE, will be removed with Release 4.0
 
 ## How to use the denylist properly
