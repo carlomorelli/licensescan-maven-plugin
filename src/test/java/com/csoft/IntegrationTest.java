@@ -44,4 +44,28 @@ public class IntegrationTest {
         }
         result.assertLogText("[ERROR]");
     }
+
+    @MavenPluginTest
+    public void test_Success_With_Noninclusive_Term() throws Exception {
+        File basedir = resources.getBasedir("integration_pass_old");
+        System.out.println(basedir.getAbsolutePath());
+        MavenExecutionResult result = maven.forProject(basedir)
+                .execute("licensescan:audit");
+        for (String logLine : result.getLog()) {
+            System.out.println("[INT-TEST]" + logLine);
+        }
+        result.assertErrorFreeLog();
+    }
+
+    @MavenPluginTest
+    public void test_Fail_With_Noninclusive_Term() throws Exception {
+        File basedir = resources.getBasedir("integration_fail_old");
+        System.out.println(basedir.getAbsolutePath());
+        MavenExecutionResult result = maven.forProject(basedir)
+                .execute("licensescan:audit");
+        for (String logLine : result.getLog()) {
+            System.out.println("[INT-TEST]" + logLine);
+        }
+        result.assertLogText("[ERROR]");
+    }
 }

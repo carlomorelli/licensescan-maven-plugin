@@ -26,12 +26,12 @@ To attach the plugin to your Maven project, add the following block in your `pom
       <version>3.0</version> <!-- check the latest version -->
       <configuration>
         <printLicenses>true</printLicenses>
-        <blacklistedLicenses>
+        <forbiddenLicenses>
           <license>GNU General Public License, v2.0</license>
           <license>GNU General Public License, v3.0</license>
           <license>regex:.*Affero.*</license> <!-- to enable use of wildcards, use string prefix 'regex:' -->
-        </blacklistedLicenses>
-        <failBuildOnBlacklisted>true</failBuildOnBlacklisted>
+        </forbiddenLicenses>
+        <failBuildOnViolation>true</failBuildOnViolation>
       </configuration>
       <executions>
         <execution>
@@ -72,8 +72,10 @@ $ mvn clean package licensescan:audit
 
 **Details on the config parameters**:
 * `printLicenses`: prints the scanned licenses during the build (default `false`);
-* `blacklistedLicenses`: the _denylist_ of licenses that the plugin will alert when found;
-* `failBuildOnBlacklisted`: if `blacklistedLicenses` are configured and at least an overall violation is found, makes the build fail (default `false`);
+* `forbiddenLicenses`: the _denylist_ of licenses that the plugin will alert when found;
+* `failBuildOnViolation`: if `forbiddenLicenses` are configured and at least an overall violation is found, makes the build fail (default `false`);
+* (**deprecated**) `blacklistedLicenses::wq`: alias for `forbiddenLicenses`; DO NOT USE, will be removed with Release 4.0
+* (**deprecated**) `failBuildOnBlacklisted`: alias for `failBuildOnViolation`; DO NOT USE, will be removed with Release 4.0
 
 ## How to use the denylist properly
 A license that we want to forbid can be indicated in the denylist either with a flat string (that will then be matched exactly as it is indicated), ot with a regular expression.

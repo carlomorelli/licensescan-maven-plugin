@@ -44,7 +44,7 @@
                 <version>3.0</version>
                 <configuration>
                     <printLicenses>true</printLicenses>
-                    <blacklistedLicenses>
+                    <forbiddenLicenses>
                         <!-- never shows up in the artifact space -->
                         <license>Apache License, Version 1.0</license>
 
@@ -55,8 +55,8 @@
                         <license>Eclipse Public License 2.0</license>
                         <license>regex:.*Classpath Exception.*</license>
 
-                    </blacklistedLicenses>
-                    <failBuildOnBlacklisted>true</failBuildOnBlacklisted>
+                    </forbiddenLicenses>
+                    <failBuildOnViolation>true</failBuildOnViolation>
                 </configuration>
                 <executions>
                     <execution>
