@@ -1,14 +1,12 @@
 package com.csoft;
 
-import java.io.File;
-
-import io.takari.maven.testing.executor.MavenExecutionResult;
-import org.junit.jupiter.api.extension.RegisterExtension;
-
 import io.takari.maven.testing.TestResources5;
 import io.takari.maven.testing.executor.MavenRuntime;
 import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
+import java.io.File;
 
 @MavenVersions({"3.8.7"})
 public class IntegrationTest {
@@ -25,47 +23,37 @@ public class IntegrationTest {
     public void test_Success() throws Exception {
         File basedir = resources.getBasedir("integration_pass");
         System.out.println(basedir.getAbsolutePath());
-        MavenExecutionResult result = maven.forProject(basedir)
-                .execute("licensescan:audit");
-        for (String logLine : result.getLog()) {
-            System.out.println("[INT-TEST]" + logLine);
-        }
-        result.assertErrorFreeLog();
+        maven.forProject(basedir)
+                .execute("licensescan:audit")
+                .assertErrorFreeLog();
     }
 
     @MavenPluginTest
     public void test_Fail() throws Exception {
         File basedir = resources.getBasedir("integration_fail");
         System.out.println(basedir.getAbsolutePath());
-        MavenExecutionResult result = maven.forProject(basedir)
-                .execute("licensescan:audit");
-        for (String logLine : result.getLog()) {
-            System.out.println("[INT-TEST]" + logLine);
-        }
-        result.assertLogText("[ERROR]");
+        maven.forProject(basedir)
+                .execute("licensescan:audit")
+                .assertLogText("[ERROR]");
     }
 
+    //To be removed in next major version, when non-inclusive terms are removed
     @MavenPluginTest
     public void test_Success_With_Noninclusive_Term() throws Exception {
         File basedir = resources.getBasedir("integration_pass_old");
         System.out.println(basedir.getAbsolutePath());
-        MavenExecutionResult result = maven.forProject(basedir)
-                .execute("licensescan:audit");
-        for (String logLine : result.getLog()) {
-            System.out.println("[INT-TEST]" + logLine);
-        }
-        result.assertErrorFreeLog();
+        maven.forProject(basedir)
+                .execute("licensescan:audit")
+                .assertErrorFreeLog();
     }
 
+    //To be removed in next major version, when non-inclusive terms are removed
     @MavenPluginTest
     public void test_Fail_With_Noninclusive_Term() throws Exception {
         File basedir = resources.getBasedir("integration_fail_old");
         System.out.println(basedir.getAbsolutePath());
-        MavenExecutionResult result = maven.forProject(basedir)
-                .execute("licensescan:audit");
-        for (String logLine : result.getLog()) {
-            System.out.println("[INT-TEST]" + logLine);
-        }
-        result.assertLogText("[ERROR]");
+        maven.forProject(basedir)
+                .execute("licensescan:audit")
+                .assertLogText("[ERROR]");
     }
 }

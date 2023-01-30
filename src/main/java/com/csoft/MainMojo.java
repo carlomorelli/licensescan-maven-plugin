@@ -1,9 +1,13 @@
 package com.csoft;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.csoft.services.ReportBuilder;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -83,18 +87,36 @@ public class MainMojo extends AbstractMojo {
         printWarning();
         DependencyAnalyzer dependencyAnalyzer = new DependencyAnalyzer(session, projectBuilder);
         LicenseScanner licenseScanner = new LicenseScanner(dependencyAnalyzer, forbiddenLicenses);
-        BuildLogger buildLogger = new BuildLogger(dependencyAnalyzer, project, getLog());
+        BuildLogger buildLogger = new BuildLogger(printLicenses, getLog());
+        ReportBuilder reportBuilder = new ReportBuilder(project);
 
-        buildLogger.logHeadAnalysis();
-        buildLogger.logBaseDeps(printLicenses);
-        buildLogger.logTransitiveDeps(printLicenses);
+        Set<Artifact> baseDeps = project.getDependencyArtifacts();
+        Set<Artifact> transitiveDeps = ArtifactUtils.getCumulativeDependencies(project);
+        Set<Artifact> allDeps = ArtifactUtils.getCumulativeDependencies(project);
+        buildLogger.logHeadAnalysis(project);
+        buildLogger.logBaseDeps(dependencyAnalyzer.analyze(baseDeps));
+        buildLogger.logTransitiveDeps(dependencyAnalyzer.analyze(transitiveDeps));
 
-        Map<String, List<String>> cumulativeForbiddenMap = licenseScanner
-                .scan(ArtifactUtils.getCumulativeDependencies(project));
-        failBuild(cumulativeForbiddenMap);
+        Map<String, List<String>> licensesMap = dependencyAnalyzer.analyze(allDeps);
+        Map<String, List<String>> violationsMap = licenseScanner.scan(allDeps);
+        String jsonFile;
+        String htmlFile;
+        try {
+            jsonFile = reportBuilder.buildJsonReport(licensesMap, violationsMap);
+            htmlFile = reportBuilder.buildHtmlReport(licensesMap, violationsMap);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage());
+        }
+        boolean buildHasViolations = violationAnalysis(violationsMap);
+        getLog().info("JSON report generated: " + jsonFile);
+        getLog().info("HTML report generated: " + htmlFile);
+
+        if (failBuildOnViolation && buildHasViolations) {
+            throw new MojoFailureException("Failing build");
+        }
     }
 
-    private void failBuild(final Map<String, List<String>> forbiddenMap) throws MojoFailureException {
+    private boolean violationAnalysis(final Map<String, List<String>> violationsMap) {
         Log log = getLog();
         boolean potentiallyFailBuild = false;
         if (forbiddenLicenses != null && !forbiddenLicenses.isEmpty()) {
@@ -104,8 +126,7 @@ public class MainMojo extends AbstractMojo {
             log.info(
                     "NOTE: For artifacts with multiple licenses, violation will be marked only when all licenses match the denylist.");
             for (String forbiddenLicense : forbiddenLicenses) {
-                List<String> array = forbiddenMap.get(forbiddenLicense);
-                // if (!array.isEmpty()) {
+                List<String> array = violationsMap.get(forbiddenLicense);
                 log.warn("Found " + array.size() + " violations for license '" + forbiddenLicense + "':");
                 for (String artifact : array) {
                     log.warn(" - " + artifact);
@@ -114,10 +135,8 @@ public class MainMojo extends AbstractMojo {
                     potentiallyFailBuild = true;
                 }
             }
-            if (failBuildOnViolation && potentiallyFailBuild) {
-                throw new MojoFailureException("Failing build");
-            }
         }
+        return potentiallyFailBuild;
     }
 
     private void printWarning() {
@@ -127,4 +146,5 @@ public class MainMojo extends AbstractMojo {
         log.warn("| will be removed in the next major release. Use 'forbiddenLicenses' and 'failBuildOnViolation' instead. |");
         log.warn("+--------------------------------------------------------------------------------------------------------+");
     }
+
 }

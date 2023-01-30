@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LicenseScanReport</title>
+</head>
+<body>
+
+<h2>LicenseScan Report</h2>
+Report Executed on: {{reportDate}}
+<br/>
+LicenseScan Maven Plugin version: {{pluginVersion}}
+
+<h3>Project under analysis</h3>
+
+ProjectName: {{projectName}}
+<br/>
+ProjectVersion: {{projectVersion}}
+<br/>
+
+<h3>Licenses per Artifact</h3>
+<table>
+    <tr>
+        <th>Artifact</th>
+        <th>Licenses attached</th>
+    </tr>
+{{#licenses}}
+    <tr>
+        <td class="leftColumn">{{key}}</td>
+        <td><div>{{#value}}{{toString}}<br/>{{/value}}</div></td>
+    </tr>
+{{/licenses}}
+</table>
+
+<h3>Artifact violations per forbidden licenses</h3>
+<table>
+    <tr>
+        <th>Forbidden license</th>
+        <th>Blocked artifacts</th>
+    </tr>
+    {{#violations}}
+        <tr>
+            <td class="leftColumn">{{key}}</td>
+            <td><div>{{#value}}{{toString}}<br/>{{/value}}</div></td>
+        </tr>
+    {{/violations}}
+</table>
+
+</body>
+
+<style>
+* {
+  font-family: Tahoma, Verdana, sans-serif;
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+  border-collapse: collapse;
+}
+th {
+  background-color: #b3f0ff;
+}
+
+th, td {
+  padding: 5px;
+}
+
+tr:hover {
+  background-color: #D6EEEE;
+}
+
+td.leftColumn {
+  background-color: #ffffcc;
+}
+
+</style>
+</html>
