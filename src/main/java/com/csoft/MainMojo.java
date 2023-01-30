@@ -44,10 +44,6 @@ public class MainMojo extends AbstractMojo {
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession session;
 
-    // NOTE: this injection is needed when running integration tests
-    //@Parameter(defaultValue = "${project.build.directory}", readonly = true, required = true)
-    //private String buildDirectory;
-
     @Component
     private ProjectBuilder projectBuilder;
 
@@ -111,7 +107,7 @@ public class MainMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage());
         }
-        boolean buildHasViolations = failBuild(violationsMap);
+        boolean buildHasViolations = violationAnalysis(violationsMap);
         getLog().info("JSON report generated: " + jsonFile);
         getLog().info("HTML report generated: " + htmlFile);
 
@@ -120,7 +116,7 @@ public class MainMojo extends AbstractMojo {
         }
     }
 
-    private boolean failBuild(final Map<String, List<String>> violationsMap) {
+    private boolean violationAnalysis(final Map<String, List<String>> violationsMap) {
         Log log = getLog();
         boolean potentiallyFailBuild = false;
         if (forbiddenLicenses != null && !forbiddenLicenses.isEmpty()) {

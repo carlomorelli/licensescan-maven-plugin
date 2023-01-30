@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Class that implements generation of a LicenseScan report in the build output dir.
+ */
 public class ReportBuilder {
 
     private static final String PLUGIN_NAMESPACE = "com.github.carlomorelli:licensescan-maven-plugin";
@@ -33,6 +36,14 @@ public class ReportBuilder {
         this.project = project;
     }
 
+    /**
+     * Produces a Report in the build dir in JSON format.
+     *
+     * @param licenseMap    artifact-to-licenses map
+     * @param violationsMap forbidden license -to- blocked artifact map
+     * @return Path of report location on filesystem.
+     * @throws IOException When serialization problems occur
+     */
     public String buildJsonReport(final Map<String, List<String>> licenseMap,
                                   final Map<String, List<String>> violationsMap) throws IOException {
         ObjectNode root = JSON_MAPPER.createObjectNode();
@@ -45,7 +56,14 @@ public class ReportBuilder {
         return jsonReportFile.toString();
     }
 
-
+    /**
+     * Produces a Report in the build dir in HTML format.
+     *
+     * @param licenseMap    artifact-to-licenses map
+     * @param violationsMap forbidden license -to- blocked artifact map
+     * @return Path of report location on filesystem.
+     * @throws IOException When serialization problems occur
+     */
     public String buildHtmlReport(final Map<String, List<String>> licenseMap,
                                   final Map<String, List<String>> violationsMap) throws IOException {
         Path reportPath = Files.createDirectories(
