@@ -1,22 +1,12 @@
 package com.csoft;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.csoft.services.ReportBuilder;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -101,30 +91,36 @@ public class MainMojo extends AbstractMojo {
         printWarning();
         DependencyAnalyzer dependencyAnalyzer = new DependencyAnalyzer(session, projectBuilder);
         LicenseScanner licenseScanner = new LicenseScanner(dependencyAnalyzer, forbiddenLicenses);
-        BuildLogger buildLogger = new BuildLogger(dependencyAnalyzer, project, getLog());
+        BuildLogger buildLogger = new BuildLogger(printLicenses, getLog());
         ReportBuilder reportBuilder = new ReportBuilder(project);
 
-        buildLogger.logHeadAnalysis();
-        buildLogger.logBaseDeps(printLicenses);
-        buildLogger.logTransitiveDeps(printLicenses);
-
-        //Set<Artifact> directDeps = ArtifactUtils.getCumulativeDependencies(project);
-        //Set<Artifact> transitiveDeps = ArtifactUtils.getCumulativeDependencies(project);
+        Set<Artifact> baseDeps = project.getDependencyArtifacts();
+        Set<Artifact> transitiveDeps = ArtifactUtils.getCumulativeDependencies(project);
         Set<Artifact> allDeps = ArtifactUtils.getCumulativeDependencies(project);
+        buildLogger.logHeadAnalysis(project);
+        buildLogger.logBaseDeps(dependencyAnalyzer.analyze(baseDeps));
+        buildLogger.logTransitiveDeps(dependencyAnalyzer.analyze(transitiveDeps));
+
         Map<String, List<String>> licensesMap = dependencyAnalyzer.analyze(allDeps);
         Map<String, List<String>> violationsMap = licenseScanner.scan(allDeps);
+        String jsonFile;
+        String htmlFile;
         try {
-            String jsonFile = reportBuilder.buildReport(licensesMap, violationsMap);
-            getLog().info("JSON report generated: " + jsonFile);
-            String htmlFile = reportBuilder.buildHtmlReport(licensesMap, violationsMap);
-            getLog().info("HTML report generated: " + htmlFile);
+            jsonFile = reportBuilder.buildJsonReport(licensesMap, violationsMap);
+            htmlFile = reportBuilder.buildHtmlReport(licensesMap, violationsMap);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage());
         }
-        failBuild(violationsMap);
+        boolean buildHasViolations = failBuild(violationsMap);
+        getLog().info("JSON report generated: " + jsonFile);
+        getLog().info("HTML report generated: " + htmlFile);
+
+        if (failBuildOnViolation && buildHasViolations) {
+            throw new MojoFailureException("Failing build");
+        }
     }
 
-    private void failBuild(final Map<String, List<String>> violationsMap) throws MojoFailureException {
+    private boolean failBuild(final Map<String, List<String>> violationsMap) {
         Log log = getLog();
         boolean potentiallyFailBuild = false;
         if (forbiddenLicenses != null && !forbiddenLicenses.isEmpty()) {
@@ -143,10 +139,8 @@ public class MainMojo extends AbstractMojo {
                     potentiallyFailBuild = true;
                 }
             }
-            if (failBuildOnViolation && potentiallyFailBuild) {
-                throw new MojoFailureException("Failing build");
-            }
         }
+        return potentiallyFailBuild;
     }
 
     private void printWarning() {

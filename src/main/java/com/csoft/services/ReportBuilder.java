@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -34,8 +33,8 @@ public class ReportBuilder {
         this.project = project;
     }
 
-    public String buildReport(final Map<String, List<String>> licenseMap,
-                              final Map<String, List<String>> violationsMap) throws IOException {
+    public String buildJsonReport(final Map<String, List<String>> licenseMap,
+                                  final Map<String, List<String>> violationsMap) throws IOException {
         ObjectNode root = JSON_MAPPER.createObjectNode();
         String jsonLicenseScan = JSON_MAPPER.writeValueAsString(new Results(licenseMap, violationsMap));
         root.put("licenseScanResults", JSON_MAPPER.readTree(jsonLicenseScan));
@@ -75,6 +74,7 @@ public class ReportBuilder {
 
         /**
          * Returns the Project Name from {@link MavenProject} properties..
+         *
          * @return String
          */
         public String projectName() {
@@ -83,6 +83,7 @@ public class ReportBuilder {
 
         /**
          * Returns the Project Version from {@link MavenProject} properties
+         *
          * @return String
          */
         public String projectVersion() {
@@ -91,6 +92,7 @@ public class ReportBuilder {
 
         /**
          * Returns the Report execution date.
+         *
          * @return String
          */
         public String reportDate() {
@@ -99,6 +101,7 @@ public class ReportBuilder {
 
         /**
          * Returns the LicenseScan Plugin version used by the Report.
+         *
          * @return String
          */
         public String pluginVersion() {
@@ -107,6 +110,7 @@ public class ReportBuilder {
 
         /**
          * Returns the artefacts-to-licenses entry-set.
+         *
          * @return Set
          */
         public Set<Map.Entry<String, List<String>>> licenses() {
@@ -115,6 +119,7 @@ public class ReportBuilder {
 
         /**
          * Returns the forbiddenLicenses-to-matchedArtefacts entry-set.
+         *
          * @return Set
          */
         public Set<Map.Entry<String, List<String>>> violations() {

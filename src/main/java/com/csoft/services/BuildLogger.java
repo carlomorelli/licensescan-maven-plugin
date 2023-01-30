@@ -1,12 +1,10 @@
 package com.csoft.services;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
-import com.csoft.utils.ArtifactUtils;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class that implements the output shown during the build by the LicenseScan
@@ -14,54 +12,49 @@ import com.csoft.utils.ArtifactUtils;
  */
 public class BuildLogger {
 
-    private final MavenProject mavenProject;
+    private final boolean printLicenses;
     private final Log log;
-    private final Map<String, List<String>> dependencyLicensesMap;
-    private final Map<String, List<String>> transitiveDependencyLicensesMap;
 
-    public BuildLogger(final DependencyAnalyzer dependencyAnalyzer, final MavenProject mavenProject, final Log log) {
-        this.mavenProject = mavenProject;
+
+    public BuildLogger(final boolean printLicenses,
+                       final Log log) {
+        this.printLicenses = printLicenses;
         this.log = log;
-        dependencyLicensesMap = dependencyAnalyzer.analyze(mavenProject.getDependencyArtifacts());
-        transitiveDependencyLicensesMap = dependencyAnalyzer
-                .analyze(ArtifactUtils.getTransitiveDependencies(mavenProject));
     }
 
     /**
-     * Prints the Header of a LicenseScan, showing all details of the project under
-     * analysis.
+     * Prints the Header of a LicenseScan log output, showing all details
+     * of the {@link MavenProject} in input.
      */
-    public void logHeadAnalysis() {
-        log.info("Found project: " + mavenProject);
-        log.info(" - artifactId          : " + mavenProject.getArtifactId());
-        log.info(" - groupId             : " + mavenProject.getGroupId());
-        log.info(" - description         : " + mavenProject.getDescription());
-        log.info(" - version             : " + mavenProject.getVersion());
-        log.info(" - getArtifact.activeP : " + mavenProject.getActiveProfiles());
-        log.info(" - getArtifact.artId   : " + mavenProject.getArtifact().getArtifactId());
-        log.info(" - getArtifact.groupId : " + mavenProject.getArtifact().getGroupId());
-        log.info(" - getArtifact.version : " + mavenProject.getArtifact().getVersion());
-        log.info(" - getArtifacts.isEmpty: " + mavenProject.getArtifacts().isEmpty());
+    public void logHeadAnalysis(final MavenProject project) {
+        log.info("Found project: " + project);
+        log.info(" - artifactId          : " + project.getArtifactId());
+        log.info(" - groupId             : " + project.getGroupId());
+        log.info(" - description         : " + project.getDescription());
+        log.info(" - version             : " + project.getVersion());
+        log.info(" - getArtifact.activeP : " + project.getActiveProfiles());
+        log.info(" - getArtifact.artId   : " + project.getArtifact().getArtifactId());
+        log.info(" - getArtifact.groupId : " + project.getArtifact().getGroupId());
+        log.info(" - getArtifact.version : " + project.getArtifact().getVersion());
+        log.info(" - getArtifacts.isEmpty: " + project.getArtifacts().isEmpty());
     }
 
     /**
      * Prints the Base Dependencies section of a LicenseScan.
      *
-     * @param printLicenses Boolean indicating wheter to print in the output the
-     *                      licenses of each artifact.
+     * @param licensesMap Map between artifact GAV label (key) and associated list of licenses (value).
      */
-    public void logBaseDeps(final boolean printLicenses) {
-        logDeps(dependencyLicensesMap, "BASE DEPENDENCIES", printLicenses);
+    public void logBaseDeps(final Map<String, List<String>> licensesMap) {
+        logDeps(licensesMap, "BASE DEPENDENCIES", printLicenses);
     }
 
     /**
      * Prints the Transitive Dependencies section of a LicenseScan.
      *
-     * @param printLicenses Boolean indicating wheter to print in the output the
-     *                      licenses of each artifact.
+     * @param licensesMap Map between artifact GAV label (key) and associated list of licenses (value).
      */
-    public void logTransitiveDeps(final boolean printLicenses) {
-        logDeps(transitiveDependencyLicensesMap, "TRANSITIVE DEPENDENCIES", printLicenses);
+    public void logTransitiveDeps(final Map<String, List<String>> licensesMap) {
+        logDeps(licensesMap, "TRANSITIVE DEPENDENCIES", printLicenses);
     }
 
     private void logDeps(final Map<String, List<String>> licensesMap,
