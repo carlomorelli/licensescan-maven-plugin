@@ -23,7 +23,7 @@ To attach the plugin to your Maven project, add the following block in your `pom
     <plugin>
       <groupId>com.github.carlomorelli</groupId>
       <artifactId>licensescan-maven-plugin</artifactId>
-      <version>3.0</version> <!-- check the latest version -->
+      <version>3.1</version> <!-- check the latest version -->
       <configuration>
         <printLicenses>true</printLicenses>
         <forbiddenLicenses>
@@ -77,6 +77,16 @@ $ mvn clean package licensescan:audit
 * (**deprecated**) `blacklistedLicenses`: alias for `forbiddenLicenses`; DO NOT USE, will be removed with Release 4.0
 * (**deprecated**) `failBuildOnBlacklisted`: alias for `failBuildOnViolation`; DO NOT USE, will be removed with Release 4.0
 
+## Output report
+> NOTE: this feature is introduced in version 3.1 and is _experimental_
+
+Together with the log console output, the LicenseScan plugin also generates complete report artifacts in the `target/license-scan-results` subdirectory.
+
+The generated report is a formatted HTML single page document (similar to JaCoCo or Checkstyle reports)
+`index.html` where the user can visualize the plugin analysis in a easier way. For programmatic analysis,
+a JSON output file is generated alongside the HTML report.
+The HTML report is built using [Moustache](https://github.com/spullara/mustache.java) template engine.
+
 ## How to use the denylist properly
 A license that we want to forbid can be indicated in the denylist either with a flat string (that will then be matched exactly as it is indicated), ot with a regular expression.
 * for flat strings, be aware that the same license may be indicated _slightly_ differently in different Maven dependencies. Example: "Apache 2.0", "Apache Apache License, Version 2.0", "Apache Version 2.0", all effectively indicate the same license. However, for the plugin to catch them all, they all need to be added into the denylist.
@@ -87,8 +97,15 @@ A license that we want to forbid can be indicated in the denylist either with a 
 
 > To make a cumulative example, if we want to match licenses with regex ".*(?<!\+\s?)GNU General Public License.\*", then it will have to be indicated as `<license>regex:.*(?&lt;!\\+\\s?)GNU General Public License.*</license>` in the denylist.
 
-## Version 3.0 updates
-With release 3.0, following changes have been implemented:
+## Changelog
+
+### Version 3.1
+* (_Experimental_) Generate JSON and HTML Report outputs.
+* Internal code cleanup of non-inclusive terms. 
+  * New conf parameter forbiddenLicenses and failBuildOnViolation added
+  * old parameters still work but on deprecation path.
+
+### Version 3.0
 * Change of logic for dual-licensed (or multiple-licensed) artifacts: an artifact will not be marked as forbidden where at least one if its licenses is not matched by the denylist configuration. Only artifacts where *all* licenses are matched by the denylist will be marked as forbidden.
 * Updated testing harness to [Takari Plugin testing framework 3.x](https://github.com/takari/takari-plugin-testing-project/releases/tag/takari-plugin-testing-3.0.1)
 * Integration test now performs tests over Maven 3.8.x
