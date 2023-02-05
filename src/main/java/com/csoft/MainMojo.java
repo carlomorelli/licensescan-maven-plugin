@@ -119,7 +119,8 @@ public class MainMojo extends AbstractMojo {
     private boolean violationAnalysis(final Map<String, List<String>> violationsMap) {
         Log log = getLog();
         boolean potentiallyFailBuild = false;
-        if (forbiddenLicenses != null && !forbiddenLicenses.isEmpty()) {
+        Set<String> forbiddenLicenses = violationsMap.keySet();
+        if (!forbiddenLicenses.isEmpty()) {
             log.info("");
             log.warn("FORBIDDEN LICENSES");
             log.warn("-----------------------");

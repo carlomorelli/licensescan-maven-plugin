@@ -1,6 +1,7 @@
 package com.csoft.services;
 
 import org.apache.maven.artifact.Artifact;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -34,12 +35,13 @@ public class LicenseScannerTest {
     private LicenseScanner licenseScanner;
 
     @Test
-    public void testScan_WHEN_noLicensesToMatch_returnsEmptyMap() {
+    public void testScan_WHEN_noLicensesToMatch_returnsMapWithNoneLicenseEntryOnly() {
         List<String> licensesToMatch = Collections.emptyList();
         when(dependencyAnalyzer.analyze(ArgumentMatchers.<Artifact>anySet())).thenReturn(analyzeMap());
         licenseScanner = new LicenseScanner(dependencyAnalyzer, licensesToMatch);
         Map<String, List<String>> result = licenseScanner.scan(new HashSet<Artifact>());
-        assertTrue(result.isEmpty());
+        assertThat(result, aMapWithSize(1));
+        assertThat(result, hasEntry(is("NONE"), empty()));
         verify(dependencyAnalyzer, times(1)).analyze(ArgumentMatchers.<Artifact>anySet());
     }
 
@@ -49,10 +51,11 @@ public class LicenseScannerTest {
         when(dependencyAnalyzer.analyze(ArgumentMatchers.<Artifact>anySet())).thenReturn(analyzeMap());
         licenseScanner = new LicenseScanner(dependencyAnalyzer, licensesToMatch);
         Map<String, List<String>> result = licenseScanner.scan(new HashSet<Artifact>());
-        assertThat(result, aMapWithSize(3));
+        assertThat(result, aMapWithSize(4));
         assertThat(result, hasEntry(is("licenseA"), empty()));
         assertThat(result, hasEntry(is("licenseB"), empty()));
         assertThat(result, hasEntry(is("regex:.*\tlicC.*"), empty()));
+        assertThat(result, hasEntry(is("NONE"), empty()));
         verify(dependencyAnalyzer, times(1)).analyze(ArgumentMatchers.<Artifact>anySet());
     }
 
@@ -62,11 +65,12 @@ public class LicenseScannerTest {
         when(dependencyAnalyzer.analyze(ArgumentMatchers.<Artifact>anySet())).thenReturn(analyzeMap());
         licenseScanner = new LicenseScanner(dependencyAnalyzer, licensesToMatch);
         Map<String, List<String>> result = licenseScanner.scan(new HashSet<Artifact>());
-        assertThat(result, aMapWithSize(4));
+        assertThat(result, aMapWithSize(5));
         assertThat(result, hasEntry(is("licenseA"), empty()));
         assertThat(result, hasEntry(is("licenseB"), empty()));
         assertThat(result, hasEntry(is("license1"), containsInAnyOrder("group1:artifact1:1.0:null")));
         assertThat(result, hasEntry(is("license2"), containsInAnyOrder("group2:artifact2:2.0:null")));
+        assertThat(result, hasEntry(is("NONE"), empty()));
         verify(dependencyAnalyzer, times(1)).analyze(ArgumentMatchers.<Artifact>anySet());
     }
 
@@ -76,9 +80,10 @@ public class LicenseScannerTest {
         when(dependencyAnalyzer.analyze(ArgumentMatchers.<Artifact>anySet())).thenReturn(analyzeMap());
         licenseScanner = new LicenseScanner(dependencyAnalyzer, licensesToMatch);
         Map<String, List<String>> result = licenseScanner.scan(new HashSet<Artifact>());
-        assertThat(result, aMapWithSize(2));
+        assertThat(result, aMapWithSize(3));
         assertThat(result, hasEntry(is("licenseA"), empty()));
         assertThat(result, hasEntry(is("license31"), empty()));
+        assertThat(result, hasEntry(is("NONE"), empty()));
         verify(dependencyAnalyzer, times(1)).analyze(ArgumentMatchers.<Artifact>anySet());
     }
 
@@ -88,13 +93,25 @@ public class LicenseScannerTest {
         when(dependencyAnalyzer.analyze(ArgumentMatchers.<Artifact>anySet())).thenReturn(analyzeMap());
         licenseScanner = new LicenseScanner(dependencyAnalyzer, licensesToMatch);
         Map<String, List<String>> result = licenseScanner.scan(new HashSet<Artifact>());
-        assertThat(result, aMapWithSize(3));
+        assertThat(result, aMapWithSize(4));
         assertThat(result, hasEntry(is("licenseA"), empty()));
         assertThat(result, hasEntry(is("license31"), containsInAnyOrder("group3:artifact3:3.0:null")));
         assertThat(result, hasEntry(is("license32"), containsInAnyOrder("group3:artifact3:3.0:null")));
+        assertThat(result, hasEntry(is("NONE"), empty()));
         verify(dependencyAnalyzer, times(1)).analyze(ArgumentMatchers.<Artifact>anySet());
     }
 
+    @Test
+    public void testScan_WHEN_licensesToMatchExistAndArtifactHasNoLicenses_returnsMapWithNoneLicenseEntryFilled() {
+        List<String> licensesToMatch = Collections.emptyList();
+        when(dependencyAnalyzer.analyze(ArgumentMatchers.<Artifact>anySet())).thenReturn(analyzeMapWithArtifactWithNoLicense());
+        licenseScanner = new LicenseScanner(dependencyAnalyzer, licensesToMatch);
+        Map<String, List<String>> result = licenseScanner.scan(new HashSet<Artifact>());
+        assertThat(result, aMapWithSize(1));
+        assertThat(result, hasEntry(is("NONE"), containsInAnyOrder("group4:artifact4:4.0:null")));
+        verify(dependencyAnalyzer, times(1)).analyze(ArgumentMatchers.<Artifact>anySet());
+    }
+    
     private static Map<String, List<String>> analyzeMap() {
         Map<String, List<String>> analyzeMap = new HashMap<>();
         analyzeMap.put("group1:artifact1:1.0:null", Arrays.asList("license1"));
@@ -104,4 +121,11 @@ public class LicenseScannerTest {
         analyzeMap.put("group3:artifact3:3.0:null", Arrays.asList("license31", "license32"));
         return analyzeMap;
     }
+
+    private static Map<String, List<String>> analyzeMapWithArtifactWithNoLicense() {
+        Map<String, List<String>> analyzeMap = new HashMap<>();
+        analyzeMap.put("group4:artifact4:4.0:null", Collections.<String>emptyList());
+        return analyzeMap;
+    }
+
 }
