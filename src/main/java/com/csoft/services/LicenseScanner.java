@@ -47,14 +47,12 @@ public class LicenseScanner {
         // also add "absent licenses" forbidden condition entry in license map
         Map<String, List<String>> returnMap = new HashMap<>();
         for (String licenseToMatch : licensesToMatch) {
-            returnMap.put(licenseToMatch, new ArrayList<String>());
+            returnMap.put(licenseToMatch, new ArrayList<>());
         }
-        returnMap.put(NONE_LICENSE, new ArrayList<String>());
+        returnMap.put(NONE_LICENSE, new ArrayList<>());
 
         // scan input map for matches
-        for (Map.Entry<String, List<String>> entry : licenseMap.entrySet()) {
-            String artifactGavLabel = entry.getKey();
-            List<String> artifactLicenses = entry.getValue();
+        licenseMap.forEach((artifactGavLabel, artifactLicenses) -> {
 
             // collect all Match results for all the licenses attached to the artifact,
             // including "absent licenses" condition
@@ -73,19 +71,20 @@ public class LicenseScanner {
             // the return map; otherwise, it means that at least one license attached to the
             // artifact is not forbidden, and we shouldn't record it in the return map.
             if (cumulativeIsMatch) {
-                List<String> forbiddenLicensesFound = new ArrayList<>();
-                for (Match forbiddenMatch : forbiddenMatches) {
-                    forbiddenLicensesFound.add(forbiddenMatch.licenseEntry);
-                }
-                for (String forbiddenLicense : forbiddenLicensesFound) {
-                    List<String> array = returnMap.get(forbiddenLicense);
-                    array.add(artifactGavLabel);
-                    returnMap.put(forbiddenLicense, array);
-                }
+                forbiddenMatches.stream()
+                        .map(forbiddenMatch -> forbiddenMatch.licenseEntry)
+                        .forEach(forbiddenLicense -> addLicenseToMapEntry(returnMap, forbiddenLicense, artifactGavLabel));
             }
-
-        }
+        });
         return returnMap;
+    }
+
+    private static void addLicenseToMapEntry(final Map<String, List<String>> map,
+                                             final String key,
+                                             final String newItemForValue) {
+        List<String> value = map.get(key);
+        value.add(newItemForValue);
+        map.put(key, value);
     }
 
     private Match matchOf(final String license) {

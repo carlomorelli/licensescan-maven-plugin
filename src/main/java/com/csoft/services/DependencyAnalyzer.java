@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -56,10 +57,9 @@ public class DependencyAnalyzer {
                         artifact.getScope());
                 buildingRequest.setProject(null);
                 MavenProject mavenProject = projectBuilder.build(artifact, buildingRequest).getProject();
-                List<String> licenseStringList = new ArrayList<>();
-                for (License license : mavenProject.getLicenses()) {
-                    licenseStringList.add(license.getName());
-                }
+                List<String> licenseStringList = mavenProject.getLicenses().stream()
+                        .map(License::getName)
+                        .collect(Collectors.toList());
                 licenseMap.put(gavLabel, licenseStringList);
             }
             return licenseMap;
