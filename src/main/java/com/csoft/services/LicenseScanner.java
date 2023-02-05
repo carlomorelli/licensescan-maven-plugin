@@ -17,6 +17,9 @@ import com.csoft.utils.TextUtils;
  */
 public class LicenseScanner {
 
+    // special forbidden license string used for artifacts with no license at all
+    public static final String NONE_LICENSE = "NONE";
+
     private final DependencyAnalyzer dependencyAnalyzer;
     private final List<String> licensesToMatch;
 
@@ -40,24 +43,30 @@ public class LicenseScanner {
 
         Map<String, List<String>> licenseMap = dependencyAnalyzer.analyze(artifacts);
 
-        // initialise return map as empty map with empty lists as values
+        // initialise return map as empty map with empty lists as values;
+        // also add "absent licenses" forbidden condition entry in license map
         Map<String, List<String>> returnMap = new HashMap<>();
         for (String licenseToMatch : licensesToMatch) {
             returnMap.put(licenseToMatch, new ArrayList<String>());
         }
+        returnMap.put(NONE_LICENSE, new ArrayList<String>());
 
         // scan input map for matches
         for (Map.Entry<String, List<String>> entry : licenseMap.entrySet()) {
             String artifactGavLabel = entry.getKey();
             List<String> artifactLicenses = entry.getValue();
 
-            // collect all Match results for all the licenses attached to the artifact
+            // collect all Match results for all the licenses attached to the artifact,
+            // including "absent licenses" condition
             boolean cumulativeIsMatch = true;
             List<Match> forbiddenMatches = new ArrayList<>();
             for (String artifactLicense : artifactLicenses) {
                 Match forbiddenMatch = matchOf(artifactLicense);
                 forbiddenMatches.add(forbiddenMatch);
                 cumulativeIsMatch = cumulativeIsMatch && forbiddenMatch.isMatch;
+            }
+            if (artifactLicenses.isEmpty()) {
+                forbiddenMatches.add(new Match(NONE_LICENSE));
             }
 
             // only if all licenses of the artifact are a match, record the license stats in

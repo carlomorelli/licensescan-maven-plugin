@@ -166,6 +166,22 @@ public class MainMojoTest {
     }
 
     @Test
+    public void test_WHEN_artifactHasNoLicenseAtAll_THEN_buildFails() throws Exception {
+        MainMojo mojo = configure(
+                builder.createArtifact("acme", "artifact", "1"),
+                builder.createArtifact("acme", "depArtifact", "1"));
+        try {
+            mojo.execute();
+            fail("should have thrown error");
+        } catch (MojoFailureException e) {
+            assertEquals("Failing build", e.getMessage());
+            log.assertWarning("Found 2 violations for license 'NONE':");
+            log.assertWarning(" - acme:artifact:1:null");
+            log.assertWarning(" - acme:depArtifact:1:null");
+        }
+    }
+
+    @Test
     public void test_WHEN_printLicensesIsOff_THEN_buildFails() throws Exception {
         MainMojo mojo = configure(
                 empty,

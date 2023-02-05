@@ -66,10 +66,11 @@ public class BuildLogger {
         for (String gavLabel : licensesMap.keySet()) {
             log.info(" - artifact " + gavLabel);
             if (printLicenses) {
-                if (licensesMap.get(gavLabel) == null) {
+                List<String> licenses = licensesMap.get(gavLabel);
+                if (licenses == null || licenses.isEmpty()) {
                     log.info("   with license: n/a");
                 } else {
-                    for (String license : licensesMap.get(gavLabel)) {
+                    for (String license : licenses) {
                         log.info("   with license: " + license);
                     }
                 }
