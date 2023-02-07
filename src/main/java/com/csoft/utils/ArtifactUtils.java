@@ -1,5 +1,6 @@
 package com.csoft.utils;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -17,8 +18,8 @@ public class ArtifactUtils {
      * @return Set of dependencies.
      */
     public static Set<Artifact> getTransitiveDependencies(final MavenProject mavenProject) {
-        Set<Artifact> transitiveDependencies = mavenProject.getArtifacts();
-        transitiveDependencies.removeAll(mavenProject.getDependencyArtifacts());
+        Set<Artifact> transitiveDependencies = new HashSet<>(mavenProject.getArtifacts());
+        transitiveDependencies.removeAll(new HashSet<>(mavenProject.getDependencyArtifacts()));
         return transitiveDependencies;
     }
 
@@ -30,8 +31,8 @@ public class ArtifactUtils {
      * @return Set of dependencies.
      */
     public static Set<Artifact> getCumulativeDependencies(final MavenProject mavenProject) {
-        Set<Artifact> cumulativeDependencies = mavenProject.getArtifacts();
-        cumulativeDependencies.addAll(mavenProject.getDependencyArtifacts());
+        Set<Artifact> cumulativeDependencies = new HashSet<>(mavenProject.getArtifacts());
+        cumulativeDependencies.addAll(new HashSet<>(mavenProject.getDependencyArtifacts()));
         return cumulativeDependencies;
     }
 

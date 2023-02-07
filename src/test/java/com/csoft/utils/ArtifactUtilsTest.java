@@ -45,7 +45,7 @@ public class ArtifactUtilsTest {
     @Test
     public void testGetTransitiveDependencies_WHEN_inputHasOnlyDirectDeps_THEN_returnsEmptySet() {
         //given
-        Set<Artifact> directDeps = new HashSet<Artifact>();
+        Set<Artifact> directDeps = new HashSet<>();
         directDeps.add(dep1);
         directDeps.add(dep2);
         when(mavenProject.getArtifacts()).thenReturn(new HashSet<Artifact>());
@@ -63,7 +63,7 @@ public class ArtifactUtilsTest {
     @Test
     public void testGetTransitiveDependencies_WHEN_inputHasOnlyDepsInGlobalSet_THEN_returnsNonEmptySet() {
         //given
-        Set<Artifact> allDeps = new HashSet<Artifact>();
+        Set<Artifact> allDeps = new HashSet<>();
         allDeps.add(dep1);
         allDeps.add(dep2);
         when(mavenProject.getArtifacts()).thenReturn(allDeps);
@@ -80,11 +80,32 @@ public class ArtifactUtilsTest {
     }
 
     @Test
+    public void testGetTransitiveDependencies_WHEN_inputHasDepsInBothSets_THEN_returnsNonEmptySetWithItemNotInCommon() {
+        //given
+        Set<Artifact> allDeps = new HashSet<>();
+        allDeps.add(dep1);
+        allDeps.add(dep2);
+        Set<Artifact> directDeps = new HashSet<>();
+        directDeps.add(dep2);
+        when(mavenProject.getArtifacts()).thenReturn(allDeps);
+        when(mavenProject.getDependencyArtifacts()).thenReturn(directDeps);
+
+        //when
+        Set<Artifact> artifacts = ArtifactUtils.getTransitiveDependencies(mavenProject);
+
+        //then
+        assertThat(artifacts.size(), is(1));
+        assertThat(artifacts, containsInAnyOrder(dep1));
+        verify(mavenProject, times(1)).getArtifacts();
+        verify(mavenProject, times(1)).getDependencyArtifacts();
+    }
+
+    @Test
     public void testGetCumulativeDependencies_WHEN_inputHasDeps_THEN_returnsNonEmptySet() {
         //given
-        Set<Artifact> allDeps = new HashSet<Artifact>();
+        Set<Artifact> allDeps = new HashSet<>();
         allDeps.add(dep1);
-        Set<Artifact> directDeps = new HashSet<Artifact>();
+        Set<Artifact> directDeps = new HashSet<>();
         allDeps.add(dep2);
         when(mavenProject.getArtifacts()).thenReturn(allDeps);
         when(mavenProject.getDependencyArtifacts()).thenReturn(directDeps);

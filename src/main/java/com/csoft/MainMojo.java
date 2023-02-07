@@ -2,6 +2,7 @@ package com.csoft;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,7 +92,7 @@ public class MainMojo extends AbstractMojo {
         ReportBuilder reportBuilder = new ReportBuilder(project);
 
         Set<Artifact> baseDeps = project.getDependencyArtifacts();
-        Set<Artifact> transitiveDeps = ArtifactUtils.getCumulativeDependencies(project);
+        Set<Artifact> transitiveDeps = ArtifactUtils.getTransitiveDependencies(project);
         Set<Artifact> allDeps = ArtifactUtils.getCumulativeDependencies(project);
         buildLogger.logHeadAnalysis(project);
         buildLogger.logBaseDeps(dependencyAnalyzer.analyze(baseDeps));
@@ -124,15 +125,14 @@ public class MainMojo extends AbstractMojo {
             log.info("");
             log.warn("FORBIDDEN LICENSES");
             log.warn("-----------------------");
-            log.info(
-                    "NOTE: For artifacts with multiple licenses, violation will be marked only when all licenses match the denylist.");
+            log.info("NOTE: For artifacts with multiple licenses, violation will be marked only when all licenses match the denylist.");
             for (String forbiddenLicense : forbiddenLicenses) {
                 List<String> array = violationsMap.get(forbiddenLicense);
-                log.warn("Found " + array.size() + " violations for license '" + forbiddenLicense + "':");
-                for (String artifact : array) {
-                    log.warn(" - " + artifact);
-                }
                 if (!array.isEmpty()) {
+                    log.warn("Found " + array.size() + " violations for license '" + forbiddenLicense + "':");
+                    for (String artifact : array) {
+                        log.warn(" - " + artifact);
+                    }
                     potentiallyFailBuild = true;
                 }
             }
