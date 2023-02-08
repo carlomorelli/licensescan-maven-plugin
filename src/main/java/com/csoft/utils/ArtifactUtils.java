@@ -18,6 +18,8 @@ public class ArtifactUtils {
      * @return Set of dependencies.
      */
     public static Set<Artifact> getTransitiveDependencies(final MavenProject mavenProject) {
+        //NOTE: we have to wrap MavenProject::getArtifacts and ::getDependencyArtifacts output sets into
+        //an HashSet to make sure that we Set::removeAll behaves predictibly.
         Set<Artifact> transitiveDependencies = new HashSet<>(mavenProject.getArtifacts());
         transitiveDependencies.removeAll(new HashSet<>(mavenProject.getDependencyArtifacts()));
         return transitiveDependencies;
@@ -31,6 +33,8 @@ public class ArtifactUtils {
      * @return Set of dependencies.
      */
     public static Set<Artifact> getCumulativeDependencies(final MavenProject mavenProject) {
+        //NOTE: we have to wrap MavenProject::getArtifacts and ::getDependencyArtifacts output sets into
+        //an HashSet to make sure that we Set::addAll behaves predictibly.
         Set<Artifact> cumulativeDependencies = new HashSet<>(mavenProject.getArtifacts());
         cumulativeDependencies.addAll(new HashSet<>(mavenProject.getDependencyArtifacts()));
         return cumulativeDependencies;
