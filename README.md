@@ -128,6 +128,21 @@ Setting up a developer environment in few steps:
 ## Contributing
 For pull requests, patches, and non-code contributions, please check `CONTRIBUTING.md`.
 
+## Demo
+To see LicenseScan Plugin in action, we recorded a quick demo using a base Spring Boot 3 project bootstrapped with [Spring Initializr](https://start.spring.io/).
+In this demo, the configured forbidden licenses are not being hit so the build overall succeeds.
+
+This is how the plugin acts during the standard build:
+
+![LicenseScan demo gif](https://i.ibb.co/Hnc0dsV/License-Scan-Plugin-Log-Demo-gif.gif)
+
+And this is how the HTML generated report looks like. In the botton part of the page,
+you can see that the plugin is not detecting any blocking artifacts:
+
+![LicenseScan report png](https://i.ibb.co/2cdGtH7/License-Scan-Plugin-Report-Demo.png)
+
+
+
 ## Foreword
 
 I developed this plugin in the spare time and I don't always have to chance to stay on top of it. However, I appreciate receiving questions or discussing feature request in the Issues GitHub tab.
