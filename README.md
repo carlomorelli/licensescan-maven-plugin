@@ -8,7 +8,7 @@
 
 
 
-LicenseScan Maven plugin audits the dependencies and the transitive dependencies for the Runtime and Compile scopes of a Maven project,
+LicenseScan Maven Plugin audits the dependencies and the transitive dependencies for the Runtime and Compile scopes of a Maven project,
 and allows to fail the build if a license is detected belonging to the configured denylist.
 
 The plugin has a single goal called `audit`. The goal can be linked at any stage of the Maven lifecycle with the appropriate `<executions/>` configuration.
@@ -23,7 +23,7 @@ To attach the plugin to your Maven project, add the following block in your `pom
     <plugin>
       <groupId>com.github.carlomorelli</groupId>
       <artifactId>licensescan-maven-plugin</artifactId>
-      <version>3.1</version> <!-- check the latest version -->
+      <version>3.2</version> <!-- check the latest version -->
       <configuration>
         <printLicenses>true</printLicenses>
         <forbiddenLicenses>
@@ -85,7 +85,7 @@ Together with the log console output, the LicenseScan plugin also generates comp
 The generated report is a formatted HTML single page document (similar to JaCoCo or Checkstyle reports)
 `index.html` where the user can visualize the plugin analysis in a easier way. For programmatic analysis,
 a JSON output file is generated alongside the HTML report.
-The HTML report is built using [Moustache](https://github.com/spullara/mustache.java) template engine.
+The HTML report is built using [Mustache](https://github.com/spullara/mustache.java) template engine.
 
 ## How to use the denylist properly
 A license that we want to forbid can be indicated in the denylist either with a flat string (that will then be matched exactly as it is indicated), ot with a regular expression.
@@ -98,6 +98,11 @@ A license that we want to forbid can be indicated in the denylist either with a 
 > To make a cumulative example, if we want to match licenses with regex ".*(?<!\+\s?)GNU General Public License.\*", then it will have to be indicated as `<license>regex:.*(?&lt;!\\+\\s?)GNU General Public License.*</license>` in the denylist.
 
 ## Changelog
+
+### Version 3.2
+* Fail build when artifacts have no dependencies
+* Parametrize the version number used by the test-project pom.xmls  
+* Fixed regression on Transient Artifacts visualization during build log
 
 ### Version 3.1
 * (_Experimental_) Generate JSON and HTML Report outputs.
@@ -130,6 +135,6 @@ I developed this plugin in the spare time and I don't always have to chance to s
 Although LicenseScan Maven Plugin is pretty safe to use, as it works only in scanning mode, remember: USE AT YOUR OWN RISK.
 
 I'm always interested in voices from the customers.
-Let me know if you find this plugin useful! 
+Let me know if you find this plugin useful! 🙌🏼
 
 --Carlo
