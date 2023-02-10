@@ -70,12 +70,18 @@ $ mvn clean package licensescan:audit
 2. supports Maven 3.x.
 
 
-**Details on the config parameters**:
-* `printLicenses`: prints the scanned licenses during the build (default `false`);
-* `forbiddenLicenses`: the _denylist_ of licenses that the plugin will alert when found;
-* `failBuildOnViolation`: if `forbiddenLicenses` are configured and at least an overall violation is found, makes the build fail (default `false`);
-* (**deprecated**) `blacklistedLicenses`: alias for `forbiddenLicenses`; DO NOT USE, will be removed with Release 4.0
-* (**deprecated**) `failBuildOnBlacklisted`: alias for `failBuildOnViolation`; DO NOT USE, will be removed with Release 4.0
+**Configuration parameters**:
+
+| Parameter              | Type    | Description                                                                                              | Defaults to |
+|------------------------|---------|----------------------------------------------------------------------------------------------------------|-------------|
+| `printLicenses`        | boolean | prints the scanned licenses during the build                                                             | false       |
+| `forbiddenLicenses`    | list    | the _denylist_ of licenses that the plugin  will alert when found                                        | n/a         |
+| `failBuildOnViolation` | boolean | if `forbiddenLicenses` are configured and  at least an overall violation is found,  makes the build fail | false       |
+
+In addition to the indicated parameter, the following aliases are supported but deprecated for removal (will be removed with Release 4.0).
+These are left only for backward compatibility with existing customers' setups. If you are a new user, please DO NOT USE:
+* `blacklistedLicenses`: alias for `forbiddenLicenses`
+* `failBuildOnBlacklisted`: alias for `failBuildOnViolation`
 
 ## Output report
 > NOTE: this feature is introduced in version 3.1 and is _experimental_
@@ -134,7 +140,7 @@ In this demo, the configured forbidden licenses are not being hit so the build o
 
 This is how the plugin acts during the standard build:
 
-![LicenseScan demo gif](https://i.ibb.co/Hnc0dsV/License-Scan-Plugin-Log-Demo-gif.gif)
+[![LicenseScan demo gif](https://s9.gifyu.com/images/LicenseScanPlugin_LogDemo.gif)](https://gifyu.com/image/Sqmet)
 
 And this is how the HTML generated report looks like. In the botton part of the page,
 you can see that the plugin is not detecting any blocking artifacts:
