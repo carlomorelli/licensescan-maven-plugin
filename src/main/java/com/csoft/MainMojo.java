@@ -1,13 +1,10 @@
 package com.csoft;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.csoft.services.BuildLogger;
+import com.csoft.services.DependencyAnalyzer;
+import com.csoft.services.LicenseScanner;
 import com.csoft.services.ReportBuilder;
+import com.csoft.utils.ArtifactUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -21,10 +18,11 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 
-import com.csoft.services.BuildLogger;
-import com.csoft.services.DependencyAnalyzer;
-import com.csoft.services.LicenseScanner;
-import com.csoft.utils.ArtifactUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Main Mojo for the LicenseScan Maven Plugin.
@@ -123,16 +121,13 @@ public class MainMojo extends AbstractMojo {
         Set<String> forbiddenLicenses = violationsMap.keySet();
         if (!forbiddenLicenses.isEmpty()) {
             log.info("");
-            log.warn("FORBIDDEN LICENSES");
-            log.warn("-----------------------");
+            log.info("-------------------< LicenseScan: Analysis >------------------");
             log.info("NOTE: For artifacts with multiple licenses, violation will be marked only when all licenses match the denylist.");
             for (String forbiddenLicense : forbiddenLicenses) {
                 List<String> array = violationsMap.get(forbiddenLicense);
                 if (!array.isEmpty()) {
                     log.warn("Found " + array.size() + " violations for license '" + forbiddenLicense + "':");
-                    for (String artifact : array) {
-                        log.warn(" - " + artifact);
-                    }
+                    array.forEach(artifact -> log.warn(" - " + artifact));
                     potentiallyFailBuild = true;
                 }
             }

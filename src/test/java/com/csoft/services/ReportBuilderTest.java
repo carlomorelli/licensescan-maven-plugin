@@ -37,7 +37,7 @@ class ReportBuilderTest {
     @InjectMocks
     private ReportBuilder reportBuilder;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void testBuildJsonReport() throws IOException {

@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MainMojoTest {
     private final String goodLicense = "Happy Freedom License v1";
@@ -45,15 +45,10 @@ public class MainMojoTest {
     public void test_WHEN_noForbiddenConfigured_THEN_buildPasses() throws Exception {
         MainMojo mojo = configure(empty, empty);
         mojo.execute();
-        log.assertInfo(" - artifactId          : test-project");
-        log.assertInfo(" - groupId             : com.acme.test.co");
-        log.assertInfo(" - description         : A nice test pom");
-        log.assertInfo(" - version             : 1");
-        log.assertInfo(" - getArtifact.activeP : ");
-        log.assertInfo(" - getArtifact.artId   : test-project");
-        log.assertInfo(" - getArtifact.groupId : com.acme.test.co");
-        log.assertInfo(" - getArtifact.version : 1");
-        log.assertInfo(" - getArtifacts.isEmpty: true");
+        log.assertInfo(" - artifactId  : test-project");
+        log.assertInfo(" - groupId     : com.acme.test.co");
+        log.assertInfo(" - description : A nice test pom");
+        log.assertInfo(" - version     : 1");
     }
 
     @Test
@@ -66,79 +61,73 @@ public class MainMojoTest {
     }
 
     @Test
-    public void test_WHEN_artifactForbiddenInDirectDeps_THEN_buildFails() throws Exception {
+    public void test_WHEN_artifactForbiddenInDirectDeps_THEN_buildFails() {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", badLicense),
                 empty);
-        try {
-            mojo.execute();
-            fail("should have thrown error");
-        } catch (MojoFailureException e) {
-            assertEquals("Failing build", e.getMessage());
-            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
-            log.assertWarning(" - acme:artifact:1:null");
-        }
+        Exception e = assertThrows(
+                MojoFailureException.class,
+                mojo::execute
+        );
+        assertEquals("Failing build", e.getMessage());
+        log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
+        log.assertWarning(" - acme:artifact:1:null");
     }
 
     @Test
-    public void test_WHEN_artifactForbiddenInTransitiveDeps_THEN_buildFails() throws Exception {
+    public void test_WHEN_artifactForbiddenInTransitiveDeps_THEN_buildFails() {
         MainMojo mojo = configure(
                 empty,
                 builder.createArtifact("acme", "artifact", "1", badLicense));
-        try {
-            mojo.execute();
-            fail("should have thrown error");
-        } catch (MojoFailureException e) {
-            assertEquals("Failing build", e.getMessage());
-            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
-            log.assertWarning(" - acme:artifact:1:null");
-        }
+        Exception e = assertThrows(
+                MojoFailureException.class,
+                mojo::execute
+        );
+        assertEquals("Failing build", e.getMessage());
+        log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
+        log.assertWarning(" - acme:artifact:1:null");
     }
 
     @Test
-    public void test_WHEN_artifactForbiddenInBothDeps_THEN_buildFails()
-            throws Exception {
+    public void test_WHEN_artifactForbiddenInBothDeps_THEN_buildFails() {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", badLicense),
                 builder.createArtifact("acme", "artifact", "1", badLicense));
-        try {
-            mojo.execute();
-            fail("should have thrown error");
-        } catch (MojoFailureException e) {
-            assertEquals("Failing build", e.getMessage());
-            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
-            log.assertWarning(" - acme:artifact:1:null");
-        }
+        Exception e = assertThrows(
+                MojoFailureException.class,
+                mojo::execute
+        );
+        assertEquals("Failing build", e.getMessage());
+        log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
+        log.assertWarning(" - acme:artifact:1:null");
     }
 
     @Test
-    public void test_WHEN_artifactForbiddenWithRegex_THEN_buildFails() throws Exception {
+    public void test_WHEN_artifactForbiddenWithRegex_THEN_buildFails() {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0"),
                 builder.createArtifact("acme", "else", "1", "Apache License, Version 2.0"));
-        try {
-            mojo.execute();
-            fail("should have thrown error");
-        } catch (MojoFailureException e) {
-            assertEquals("Failing build", e.getMessage());
-            log.assertWarning("Found 1 violations for license 'regex:Apache.*Version 1.*':");
-            log.assertWarning(" - acme:artifact:1:null");
-        }
+        Exception e = assertThrows(
+                MojoFailureException.class,
+                mojo::execute
+        );
+        assertEquals("Failing build", e.getMessage());
+        log.assertWarning("Found 1 violations for license 'regex:Apache.*Version 1.*':");
+        log.assertWarning(" - acme:artifact:1:null");
     }
 
     @Test
-    public void test_WHEN_artifactForbiddenWithRegexWithAllCaps_THEN_buildFails() throws Exception {
+    public void test_WHEN_artifactForbiddenWithRegexWithAllCaps_THEN_buildFails() {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", "Apache License, Version 1.0".toUpperCase()),
                 empty);
-        try {
-            mojo.execute();
-            fail("should have thrown error");
-        } catch (MojoFailureException e) {
-            assertEquals("Failing build", e.getMessage());
-            log.assertWarning("Found 1 violations for license 'regex:Apache.*Version 1.*':");
-            log.assertWarning(" - acme:artifact:1:null");
-        }
+        Exception e = assertThrows(
+                MojoFailureException.class,
+                mojo::execute
+        );
+        assertEquals("Failing build", e.getMessage());
+        log.assertWarning("Found 1 violations for license 'regex:Apache.*Version 1.*':");
+        log.assertWarning(" - acme:artifact:1:null");
     }
 
     @Test
@@ -151,50 +140,48 @@ public class MainMojoTest {
     }
 
     @Test
-    public void test_WHEN_artifactDualLicensedAndBothForbidden_THEN_buildFails() throws Exception {
+    public void test_WHEN_artifactDualLicensedAndBothForbidden_THEN_buildFails() {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1", badLicense, "Apache, Version 1.0"),
                 empty);
-        try {
-            mojo.execute();
-            fail("should have thrown error");
-        } catch (MojoFailureException e) {
-            assertEquals("Failing build", e.getMessage());
-            log.assertWarning("Found 1 violations for license 'regex:Apache.*Version 1.*':");
-            log.assertWarning(" - acme:artifact:1:null");
-        }
+        Exception e = assertThrows(
+                MojoFailureException.class,
+                mojo::execute
+        );
+        assertEquals("Failing build", e.getMessage());
+        log.assertWarning("Found 1 violations for license 'regex:Apache.*Version 1.*':");
+        log.assertWarning(" - acme:artifact:1:null");
     }
 
     @Test
-    public void test_WHEN_artifactHasNoLicenseAtAll_THEN_buildFails() throws Exception {
+    public void test_WHEN_artifactHasNoLicenseAtAll_THEN_buildFails() {
         MainMojo mojo = configure(
                 builder.createArtifact("acme", "artifact", "1"),
                 builder.createArtifact("acme", "depArtifact", "1"));
-        try {
-            mojo.execute();
-            fail("should have thrown error");
-        } catch (MojoFailureException e) {
-            assertEquals("Failing build", e.getMessage());
-            log.assertWarning("Found 2 violations for license 'NONE':");
-            log.assertWarning(" - acme:artifact:1:null");
-            log.assertWarning(" - acme:depArtifact:1:null");
-        }
+        Exception e = assertThrows(
+                MojoFailureException.class,
+                mojo::execute
+        );
+        assertEquals("Failing build", e.getMessage());
+        log.assertWarning("Found 2 violations for license 'NONE':");
+        log.assertWarning(" - acme:artifact:1:null");
+        log.assertWarning(" - acme:depArtifact:1:null");
     }
 
+
     @Test
-    public void test_WHEN_printLicensesIsOff_THEN_buildFails() throws Exception {
+    public void test_WHEN_printLicensesIsOff_THEN_buildFails() {
         MainMojo mojo = configure(
                 empty,
                 builder.createArtifact("acme", "artifact", "1", badLicense));
         mojo.setPrintLicenses(false);
-        try {
-            mojo.execute();
-            fail("should have thrown error");
-        } catch (MojoFailureException e) {
-            assertEquals("Failing build", e.getMessage());
-            log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
-            log.assertWarning(" - acme:artifact:1:null");
-        }
+        Exception e = assertThrows(
+                MojoFailureException.class,
+                mojo::execute
+        );
+        assertEquals("Failing build", e.getMessage());
+        log.assertWarning("Found 1 violations for license 'Bad Banned License v2':");
+        log.assertWarning(" - acme:artifact:1:null");
     }
 
     private MainMojo configure(Set<Artifact> primaryArtifacts,

@@ -27,16 +27,13 @@ public class BuildLogger {
      * of the {@link MavenProject} in input.
      */
     public void logHeadAnalysis(final MavenProject project) {
-        log.info("Found project: " + project);
-        log.info(" - artifactId          : " + project.getArtifactId());
-        log.info(" - groupId             : " + project.getGroupId());
-        log.info(" - description         : " + project.getDescription());
-        log.info(" - version             : " + project.getVersion());
-        log.info(" - getArtifact.activeP : " + project.getActiveProfiles());
-        log.info(" - getArtifact.artId   : " + project.getArtifact().getArtifactId());
-        log.info(" - getArtifact.groupId : " + project.getArtifact().getGroupId());
-        log.info(" - getArtifact.version : " + project.getArtifact().getVersion());
-        log.info(" - getArtifacts.isEmpty: " + project.getArtifacts().isEmpty());
+        log.info("");
+        log.info("---------------< LicenseScan: Project Details >---------------");
+        log.info(" - artifactId  : " + project.getArtifactId());
+        log.info(" - groupId     : " + project.getGroupId());
+        log.info(" - description : " + project.getDescription());
+        log.info(" - version     : " + project.getVersion());
+        log.info(" - path        : " + project.getFile().getPath());
     }
 
     /**
@@ -45,7 +42,7 @@ public class BuildLogger {
      * @param licensesMap Map between artifact GAV label (key) and associated list of licenses (value).
      */
     public void logBaseDeps(final Map<String, List<String>> licensesMap) {
-        logDeps(licensesMap, "BASE DEPENDENCIES", printLicenses);
+        logDeps(licensesMap, "--------------< LicenseScan: Base Dependencies >--------------", printLicenses);
     }
 
     /**
@@ -54,15 +51,14 @@ public class BuildLogger {
      * @param licensesMap Map between artifact GAV label (key) and associated list of licenses (value).
      */
     public void logTransitiveDeps(final Map<String, List<String>> licensesMap) {
-        logDeps(licensesMap, "TRANSITIVE DEPENDENCIES", printLicenses);
+        logDeps(licensesMap, "-----------< LicenseScan: Transitive Dependencies >-----------", printLicenses);
     }
 
     private void logDeps(final Map<String, List<String>> licensesMap,
-                         final String titleLabel,
+                         final String sectionTitle,
                          final boolean printLicenses) {
         log.info("");
-        log.info(titleLabel);
-        log.info("-----------------------");
+        log.info(sectionTitle);
         for (String gavLabel : licensesMap.keySet()) {
             log.info(" - artifact " + gavLabel);
             if (printLicenses) {
