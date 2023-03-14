@@ -18,12 +18,15 @@ public class TestArtifact implements Artifact {
     private final String group;
     private final String artifact;
     private final String version;
+    private final String scope;
 
-    public TestArtifact(String group, String artifact, String version) {
+    public TestArtifact(String group, String artifact, String version, String scope) {
         this.group = group;
         this.artifact = artifact;
         this.version = version;
+        this.scope = scope;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -62,7 +65,7 @@ public class TestArtifact implements Artifact {
     }
 
     public String getScope() {
-        return null;
+        return scope;
     }
 
     public String getType() {

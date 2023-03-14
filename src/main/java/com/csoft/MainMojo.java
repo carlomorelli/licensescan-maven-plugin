@@ -89,7 +89,7 @@ public class MainMojo extends AbstractMojo {
         BuildLogger buildLogger = new BuildLogger(printLicenses, getLog());
         ReportBuilder reportBuilder = new ReportBuilder(project);
 
-        Set<Artifact> baseDeps = project.getDependencyArtifacts();
+        Set<Artifact> baseDeps = ArtifactUtils.getDirectDependencies(project);
         Set<Artifact> transitiveDeps = ArtifactUtils.getTransitiveDependencies(project);
         Set<Artifact> allDeps = ArtifactUtils.getCumulativeDependencies(project);
         buildLogger.logHeadAnalysis(project);

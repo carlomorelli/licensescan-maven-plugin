@@ -16,40 +16,41 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class TestProjectBuilder implements ProjectBuilder {
-    private Map<Artifact, TreeSet<License>> licenses = new HashMap<Artifact, TreeSet<License>>();
+    private Map<Artifact, TreeSet<License>> licenses = new HashMap<>();
 
-    public Set<Artifact> createArtifact(String group, String artifact, String version, String... licenseStrings) {
-        Artifact a = new TestArtifact(group, artifact, version);
+    public Set<Artifact> createArtifact(String group, String artifact, String version, Set<String> licenseStrings) {
+        // Note: setting the scope as 'compile' as it is the default scope in Maven when not specified
+        //(see https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope)
+        return createArtifact(group, artifact, version, "compile", licenseStrings);
+    }
+
+    public Set<Artifact> createArtifact(String group, String artifact, String version, String scope, Set<String> licenseStrings) {
+        Artifact a = new TestArtifact(group, artifact, version, scope);
         if (!licenses.containsKey(a)) {
-            licenses.put(a, new TreeSet<License>(new Comparator<License>() {
-                public int compare(License o1, License o2) {
-                    return ComparisonChain.start()
-                            .compare(o1.getName(), o2.getName())
-                            .result();
-                }
-            }));
+            licenses.put(a, new TreeSet<>((o1, o2) -> ComparisonChain.start()
+                    .compare(o1.getName(), o2.getName())
+                    .result()));
         }
         licenses.get(a).addAll(toLicenses(licenseStrings));
         return Collections.singleton(a);
     }
 
-    private Collection<License> toLicenses(String[] licenseStrings) {
-        Set<License> set = new HashSet<License>();
-        for (String s : licenseStrings) {
-            License l = new License();
-            l.setName(s);
-            set.add(l);
-        }
-        return set;
+    private static Collection<License> toLicenses(Set<String> licenseStrings) {
+        return licenseStrings.stream()
+                .map(licenseString -> {
+                    License license = new License();
+                    license.setName(licenseString);
+                    return license;
+                })
+                .collect(Collectors.toSet());
     }
 
     public ProjectBuildingResult build(File projectFile, ProjectBuildingRequest request) throws ProjectBuildingException {
