@@ -15,7 +15,7 @@
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <maven-coveralls-plugin.version>4.3.0</maven-coveralls-plugin.version>
         <maven-takari-lifecycle-plugin.version>2.1.0</maven-takari-lifecycle-plugin.version>
-        <maven.version>3.0.5</maven.version>
+        <maven.version>3.8.1</maven.version>
         <takari-testing.version>3.0.1</takari-testing.version>
         <maven-surefire-plugin.version>3.0.0-M8</maven-surefire-plugin.version>
         <commons-text.version>1.10.0</commons-text.version>
